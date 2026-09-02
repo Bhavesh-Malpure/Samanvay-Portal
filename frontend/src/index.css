@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+/* =========================================================
+   SAMANVAY PORTAL — GLOBAL STYLES
+   ========================================================= */
+
+:root {
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  color: #4a4a4a;
+  background: #fff5f5;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Global box sizing */
+* {
+  box-sizing: border-box;
+}
+
+/* Page */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+
+  background-color: #fff5f5;
+  color: #4a4a4a;
+}
+
+/* Remove default link styling */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Form elements */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+/* Buttons */
+button {
+  cursor: pointer;
+}
+
+/* Better image behavior */
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Selection */
+::selection {
+  background-color: #e2b4bd;
+  color: #4a4a4a;
+}
