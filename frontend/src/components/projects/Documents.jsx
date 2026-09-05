@@ -1,218 +1,260 @@
 import React, { useState } from "react";
 
-const initialDocuments = [
-  {
-    id: 1,
-    name: "Project Proposal.pdf",
-    type: "PDF",
-    uploadedBy: "Rahul Patil",
-    date: "28 Aug 2026",
-    size: "1.8 MB",
-  },
-  {
-    id: 2,
-    name: "System Architecture.pdf",
-    type: "PDF",
-    uploadedBy: "Akash Chaudhari",
-    date: "30 Aug 2026",
-    size: "2.4 MB",
-  },
-  {
-    id: 3,
-    name: "Field Testing Report.docx",
-    type: "DOC",
-    uploadedBy: "Pooja Shinde",
-    date: "02 Sep 2026",
-    size: "860 KB",
-  },
-  {
-    id: 4,
-    name: "Prototype Documentation.pdf",
-    type: "PDF",
-    uploadedBy: "Sneha Mahale",
-    date: "03 Sep 2026",
-    size: "3.1 MB",
-  },
-];
-
 function Documents() {
-  const [documents, setDocuments] = useState(initialDocuments);
+  const [documents, setDocuments] = useState([
+    {
+      id: 1,
+      name: "Project Proposal.pdf",
+      type: "PDF",
+      size: "1.8 MB",
+      uploaded: "20 Aug 2026",
+    },
+    {
+      id: 2,
+      name: "System Architecture.pdf",
+      type: "PDF",
+      size: "2.4 MB",
+      uploaded: "22 Aug 2026",
+    },
+    {
+      id: 3,
+      name: "Field Testing Report.docx",
+      type: "DOCX",
+      size: "1.2 MB",
+      uploaded: "28 Aug 2026",
+    },
+    {
+      id: 4,
+      name: "Prototype Documentation.pdf",
+      type: "PDF",
+      size: "3.1 MB",
+      uploaded: "30 Aug 2026",
+    },
+  ]);
 
-  const uploadDocument = () => {
+  const handleUpload = () => {
     const newDocument = {
       id: Date.now(),
       name: "New Project Document.pdf",
       type: "PDF",
-      uploadedBy: "Current User",
-      date: "03 Sep 2026",
-      size: "1.2 MB",
+      size: "1.0 MB",
+      uploaded: "04 Sep 2026",
     };
 
-    setDocuments([...documents, newDocument]);
+    setDocuments((current) => [
+      ...current,
+      newDocument,
+    ]);
   };
 
   const removeDocument = (id) => {
-    setDocuments(
-      documents.filter((document) => document.id !== id)
+    setDocuments((current) =>
+      current.filter((document) => document.id !== id)
+    );
+  };
+
+  const viewDocument = (document) => {
+    alert(
+      "Preview simulation\n\n" +
+        document.name +
+        "\n\nActual document preview will be available after backend and file storage integration."
     );
   };
 
   return (
-    <div style={styles.card}>
+    <div>
       <div style={styles.header}>
         <div>
           <h2 style={styles.title}>Project Documents</h2>
-          <p style={styles.subtitle}>
-            Important files and documentation for the project.
+
+          <p style={styles.description}>
+            Project proposals, architecture documents, reports and
+            other supporting files.
           </p>
         </div>
 
         <button
+          onClick={handleUpload}
           style={styles.uploadButton}
-          onClick={uploadDocument}
         >
           + Upload Document
         </button>
       </div>
 
-      <div style={styles.notice}>
-        Prototype mode: document upload is simulated locally.
+      <div style={styles.note}>
+        <strong>Prototype mode:</strong> document upload is simulated
+        using local React state. Actual file storage will be connected
+        during backend integration.
       </div>
 
-      <div>
+      <div style={styles.documents}>
         {documents.map((document) => (
-          <div key={document.id} style={styles.document}>
+          <div key={document.id} style={styles.documentCard}>
             <div style={styles.fileIcon}>
               {document.type}
             </div>
 
             <div style={styles.fileInfo}>
-              <h3>{document.name}</h3>
+              <div style={styles.fileName}>
+                {document.name}
+              </div>
 
-              <p>
-                Uploaded by {document.uploadedBy} •{" "}
-                {document.date}
-              </p>
+              <div style={styles.fileMeta}>
+                {document.size} • Uploaded {document.uploaded}
+              </div>
             </div>
 
-            <span style={styles.size}>
-              {document.size}
-            </span>
+            <div style={styles.actions}>
+              <button
+                onClick={() => viewDocument(document)}
+                style={styles.viewButton}
+              >
+                View
+              </button>
 
-            <button
-              style={styles.actionButton}
-              onClick={() =>
-                alert("Document preview is available in the prototype.")
-              }
-            >
-              View
-            </button>
-
-            <button
-              style={styles.deleteButton}
-              onClick={() => removeDocument(document.id)}
-            >
-              Remove
-            </button>
+              <button
+                onClick={() => removeDocument(document.id)}
+                style={styles.removeButton}
+              >
+                Remove
+              </button>
+            </div>
           </div>
         ))}
       </div>
+
+      {documents.length === 0 && (
+        <div style={styles.empty}>
+          No documents available.
+        </div>
+      )}
     </div>
   );
 }
 
 const styles = {
-  card: {
-    background: "#FFFFFF",
-    border: "1px solid #E2B4BD",
-    borderRadius: "16px",
-    padding: "24px",
-  },
-
   header: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-start",
+    gap: "15px",
     marginBottom: "18px",
   },
 
   title: {
-    margin: 0,
-    fontSize: "20px",
+    margin: "0 0 7px",
+    fontSize: "23px",
+    color: "#4A4A4A",
   },
 
-  subtitle: {
-    margin: "5px 0 0",
-    color: "#888",
-    fontSize: "13px",
+  description: {
+    margin: 0,
+    fontSize: "14px",
+    color: "#6F6064",
   },
 
   uploadButton: {
     border: "none",
-    background: "#4A4A4A",
-    color: "#FFF5F5",
-    padding: "10px 14px",
+    background: "#E2B4BD",
+    color: "#4A4A4A",
     borderRadius: "8px",
-    fontWeight: "700",
+    padding: "10px 15px",
+    fontSize: "13px",
+    fontWeight: "600",
     cursor: "pointer",
+    whiteSpace: "nowrap",
   },
 
-  notice: {
-    background: "#F7D6D0",
-    border: "1px solid #E2B4BD",
-    padding: "10px 13px",
-    borderRadius: "8px",
+  note: {
+    background: "#FFF5F5",
+    border: "1px solid #F0E1E1",
+    borderRadius: "9px",
+    padding: "13px",
     fontSize: "12px",
-    marginBottom: "15px",
+    color: "#7A696D",
+    marginBottom: "18px",
+    lineHeight: "1.5",
   },
 
-  document: {
+  documents: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+  },
+
+  documentCard: {
     display: "flex",
     alignItems: "center",
     gap: "13px",
-    padding: "15px 0",
-    borderTop: "1px solid #F0E1E1",
+    border: "1px solid #F0E1E1",
+    borderRadius: "10px",
+    padding: "14px",
+    background: "#FFFFFF",
   },
 
   fileIcon: {
-    width: "42px",
-    height: "42px",
-    borderRadius: "9px",
+    width: "44px",
+    height: "44px",
+    borderRadius: "8px",
     background: "#F7D6D0",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontSize: "10px",
-    fontWeight: "800",
+    fontWeight: "700",
+    color: "#6F6064",
+    flexShrink: 0,
   },
 
   fileInfo: {
     flex: 1,
+    minWidth: 0,
   },
 
-  size: {
+  fileName: {
+    fontSize: "14px",
+    fontWeight: "600",
+    color: "#4A4A4A",
+    wordBreak: "break-word",
+  },
+
+  fileMeta: {
+    marginTop: "4px",
     fontSize: "11px",
-    color: "#999",
+    color: "#8A777B",
   },
 
-  actionButton: {
-    border: "1px solid #E2B4BD",
+  actions: {
+    display: "flex",
+    gap: "7px",
+  },
+
+  viewButton: {
+    border: "1px solid #E2C7CB",
     background: "#FFF5F5",
+    color: "#4A4A4A",
+    borderRadius: "6px",
     padding: "7px 10px",
-    borderRadius: "7px",
-    fontSize: "11px",
-    fontWeight: "700",
     cursor: "pointer",
+    fontSize: "11px",
   },
 
-  deleteButton: {
+  removeButton: {
     border: "none",
-    background: "transparent",
-    color: "#9B6670",
-    padding: "7px",
-    fontSize: "11px",
-    fontWeight: "700",
+    background: "#F7D6D0",
+    color: "#7E3545",
+    borderRadius: "6px",
+    padding: "7px 10px",
     cursor: "pointer",
+    fontSize: "11px",
+  },
+
+  empty: {
+    textAlign: "center",
+    padding: "40px",
+    color: "#8A777B",
+    background: "#FFF5F5",
+    borderRadius: "10px",
   },
 };
 

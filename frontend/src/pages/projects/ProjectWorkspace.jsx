@@ -1,109 +1,122 @@
 import React, { useState } from "react";
 
-import ProjectOverview from "../components/projects/ProjectOverview";
-import Milestones from "../components/projects/Milestones";
-import TeamMembers from "../components/projects/TeamMembers";
-import Documents from "../components/projects/Documents";
-import ImpactMetrics from "../components/projects/ImpactMetrics";
+import ProjectOverview from "../../components/projects/ProjectOverview";
+import Milestones from "../../components/projects/Milestones";
+import TeamMembers from "../../components/projects/TeamMembers";
+import Documents from "../../components/projects/Documents";
+import ImpactMetrics from "../../components/projects/ImpactMetrics";
 
 function ProjectWorkspace() {
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("Overview");
 
   const tabs = [
-    { id: "overview", label: "Overview" },
-    { id: "milestones", label: "Milestones" },
-    { id: "team", label: "Team Members" },
-    { id: "documents", label: "Documents" },
-    { id: "impact", label: "Impact Metrics" },
+    "Overview",
+    "Milestones",
+    "Team Members",
+    "Documents",
+    "Impact Metrics",
   ];
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "Overview":
+        return <ProjectOverview />;
+
+      case "Milestones":
+        return <Milestones />;
+
+      case "Team Members":
+        return <TeamMembers />;
+
+      case "Documents":
+        return <Documents />;
+
+      case "Impact Metrics":
+        return <ImpactMetrics />;
+
+      default:
+        return <ProjectOverview />;
+    }
+  };
 
   return (
     <div style={styles.page}>
-      <div style={styles.container}>
-        {/* Header */}
-        <div style={styles.header}>
-          <div>
-            <p style={styles.eyebrow}>SAMANVAY PROJECT WORKSPACE</p>
+      {/* Header */}
+      <div style={styles.header}>
+        <div>
+          <div style={styles.backText}>← Project Workspace</div>
 
-            <h1 style={styles.title}>
-              Smart Electricity Monitoring
-            </h1>
+          <h1 style={styles.title}>Smart Electricity Monitoring</h1>
 
-            <p style={styles.subtitle}>
-              Project ID: SAM-PROJ-001 • Dhule City • Electricity
-            </p>
-          </div>
-
-          <div style={styles.statusBadge}>
-            In Progress
+          <div style={styles.projectMeta}>
+            <span>Project ID: SAM-PROJ-001</span>
+            <span>•</span>
+            <span>Dhule City</span>
+            <span>•</span>
+            <span>Electricity</span>
           </div>
         </div>
 
-        {/* Project Summary */}
+        <div style={styles.statusBadge}>In Progress</div>
+      </div>
+
+      {/* Project Summary */}
+      <div style={styles.summaryGrid}>
         <div style={styles.summaryCard}>
-          <div>
-            <span style={styles.summaryLabel}>Project Progress</span>
+          <div style={styles.summaryLabel}>Project Progress</div>
 
-            <div style={styles.progressRow}>
-              <div style={styles.progressBar}>
-                <div
-                  style={{
-                    ...styles.progressFill,
-                    width: "72%",
-                  }}
-                />
-              </div>
-
-              <strong>72%</strong>
-            </div>
+          <div style={styles.progressRow}>
+            <strong style={styles.progressValue}>72%</strong>
+            <span style={styles.progressText}>Complete</span>
           </div>
 
-          <div style={styles.summaryItem}>
-            <span>Priority</span>
-            <strong>High</strong>
-          </div>
-
-          <div style={styles.summaryItem}>
-            <span>Student Team</span>
-            <strong>Team Volt</strong>
-          </div>
-
-          <div style={styles.summaryItem}>
-            <span>Faculty Mentor</span>
-            <strong>Dr. Amit Patil</strong>
+          <div style={styles.progressBackground}>
+            <div
+              style={{
+                ...styles.progressFill,
+                width: "72%",
+              }}
+            />
           </div>
         </div>
 
-        {/* Tabs */}
-        <div style={styles.tabs}>
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={
-                activeTab === tab.id
-                  ? styles.activeTab
-                  : styles.tab
-              }
-            >
-              {tab.label}
-            </button>
-          ))}
+        <div style={styles.summaryCard}>
+          <div style={styles.summaryLabel}>Priority</div>
+          <div style={styles.priorityValue}>High</div>
+          <div style={styles.smallText}>Urgent societal problem</div>
         </div>
 
-        {/* Workspace */}
-        <div style={styles.workspace}>
-          {activeTab === "overview" && <ProjectOverview />}
+        <div style={styles.summaryCard}>
+          <div style={styles.summaryLabel}>Project Team</div>
+          <div style={styles.summaryValue}>Team Volt</div>
+          <div style={styles.smallText}>5 student members</div>
+        </div>
 
-          {activeTab === "milestones" && <Milestones />}
-
-          {activeTab === "team" && <TeamMembers />}
-
-          {activeTab === "documents" && <Documents />}
-
-          {activeTab === "impact" && <ImpactMetrics />}
+        <div style={styles.summaryCard}>
+          <div style={styles.summaryLabel}>Faculty Mentor</div>
+          <div style={styles.summaryValue}>Dr. Amit Patil</div>
+          <div style={styles.smallText}>Computer Engineering</div>
         </div>
       </div>
+
+      {/* Tabs */}
+      <div style={styles.tabsContainer}>
+        {tabs.map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            style={{
+              ...styles.tab,
+              ...(activeTab === tab ? styles.activeTab : {}),
+            }}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
+      {/* Content */}
+      <div style={styles.content}>{renderTabContent()}</div>
     </div>
   );
 }
@@ -112,14 +125,9 @@ const styles = {
   page: {
     minHeight: "100vh",
     background: "#FFF5F5",
-    color: "#4A4A4A",
-    padding: "32px",
+    padding: "30px",
     boxSizing: "border-box",
-  },
-
-  container: {
-    maxWidth: "1250px",
-    margin: "0 auto",
+    color: "#4A4A4A",
   },
 
   header: {
@@ -127,66 +135,100 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "flex-start",
     gap: "20px",
-    marginBottom: "22px",
+    marginBottom: "25px",
   },
 
-  eyebrow: {
-    margin: "0 0 7px",
-    color: "#9B6670",
-    fontSize: "11px",
-    fontWeight: "800",
-    letterSpacing: "2px",
+  backText: {
+    fontSize: "14px",
+    color: "#8C6F76",
+    marginBottom: "10px",
   },
 
   title: {
     margin: 0,
     fontSize: "30px",
-    fontWeight: "800",
+    fontWeight: "700",
+    color: "#4A4A4A",
   },
 
-  subtitle: {
-    margin: "8px 0 0",
-    color: "#888",
+  projectMeta: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "8px",
+    marginTop: "10px",
     fontSize: "14px",
+    color: "#7A696D",
   },
 
   statusBadge: {
-    background: "#F7D6D0",
-    border: "1px solid #E2B4BD",
-    padding: "9px 14px",
+    background: "#E2B4BD",
+    color: "#4A4A4A",
+    padding: "9px 16px",
     borderRadius: "20px",
-    fontSize: "12px",
-    fontWeight: "800",
+    fontSize: "13px",
+    fontWeight: "600",
+    whiteSpace: "nowrap",
+  },
+
+  summaryGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+    gap: "16px",
+    marginBottom: "25px",
   },
 
   summaryCard: {
     background: "#FFFFFF",
-    border: "1px solid #E2B4BD",
-    borderRadius: "16px",
-    padding: "20px",
-    display: "grid",
-    gridTemplateColumns: "1.5fr repeat(3, 1fr)",
-    gap: "20px",
-    alignItems: "center",
-    marginBottom: "22px",
+    border: "1px solid #F0E1E1",
+    borderRadius: "12px",
+    padding: "18px",
+    boxSizing: "border-box",
   },
 
   summaryLabel: {
-    display: "block",
-    fontSize: "11px",
-    color: "#888",
+    fontSize: "13px",
+    color: "#8A777B",
     marginBottom: "8px",
+  },
+
+  summaryValue: {
+    fontSize: "19px",
+    fontWeight: "700",
+    color: "#4A4A4A",
+  },
+
+  priorityValue: {
+    fontSize: "20px",
+    fontWeight: "700",
+    color: "#8B3F4F",
+  },
+
+  smallText: {
+    marginTop: "5px",
+    fontSize: "12px",
+    color: "#8A777B",
   },
 
   progressRow: {
     display: "flex",
-    alignItems: "center",
-    gap: "10px",
+    alignItems: "baseline",
+    gap: "8px",
+    marginBottom: "10px",
   },
 
-  progressBar: {
-    height: "9px",
-    flex: 1,
+  progressValue: {
+    fontSize: "25px",
+    color: "#4A4A4A",
+  },
+
+  progressText: {
+    fontSize: "13px",
+    color: "#8A777B",
+  },
+
+  progressBackground: {
+    width: "100%",
+    height: "8px",
     background: "#F7D6D0",
     borderRadius: "10px",
     overflow: "hidden",
@@ -194,49 +236,45 @@ const styles = {
 
   progressFill: {
     height: "100%",
-    background: "#4A4A4A",
+    background: "#E2B4BD",
     borderRadius: "10px",
   },
 
-  summaryItem: {
-    borderLeft: "1px solid #F0E1E1",
-    paddingLeft: "20px",
-  },
-
-  tabs: {
+  tabsContainer: {
     display: "flex",
-    gap: "5px",
-    background: "#F7D6D0",
-    padding: "6px",
+    flexWrap: "wrap",
+    gap: "8px",
+    background: "#FFFFFF",
+    border: "1px solid #F0E1E1",
     borderRadius: "12px",
+    padding: "8px",
     marginBottom: "20px",
-    overflowX: "auto",
   },
 
   tab: {
     border: "none",
     background: "transparent",
-    color: "#666",
-    padding: "11px 17px",
+    color: "#6F6064",
+    padding: "11px 16px",
     borderRadius: "8px",
-    fontWeight: "600",
     cursor: "pointer",
-    whiteSpace: "nowrap",
+    fontSize: "14px",
+    fontWeight: "500",
   },
 
   activeTab: {
-    border: "none",
-    background: "#4A4A4A",
-    color: "#FFF5F5",
-    padding: "11px 17px",
-    borderRadius: "8px",
+    background: "#F7D6D0",
+    color: "#4A4A4A",
     fontWeight: "700",
-    cursor: "pointer",
-    whiteSpace: "nowrap",
   },
 
-  workspace: {
+  content: {
+    background: "#FFFFFF",
+    border: "1px solid #F0E1E1",
+    borderRadius: "12px",
+    padding: "24px",
     minHeight: "400px",
+    boxSizing: "border-box",
   },
 };
 

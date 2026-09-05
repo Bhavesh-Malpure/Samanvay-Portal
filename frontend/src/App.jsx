@@ -9,6 +9,7 @@ import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
+// Citizen
 import CitizenDashboard from "./pages/citizen/CitizenDashboard";
 import SubmitProblem from "./pages/citizen/SubmitProblem";
 import MyProblems from "./pages/citizen/MyProblems";
@@ -26,7 +27,7 @@ import FacultyDashboard from "./pages/university/FacultyDashboard";
 import UniversityAdminDashboard from "./pages/university/UniversityAdminDashboard";
 import Projects from "./pages/university/Projects";
 
-// University Components / Workspaces
+// University Workspaces
 import StudentWorkspace from "./components/university/StudentWorkspace";
 import FacultyWorkspace from "./components/university/FacultyWorkspace";
 import UniversityAdmin from "./components/university/UniversityAdmin";
@@ -42,8 +43,8 @@ import IndustryProfile from "./components/industry/IndustryProfile";
 import CollaborationRequests from "./components/industry/CollaborationRequests";
 
 // Project System
-import ProjectWorkspace from "./pages/ProjectWorkspace";
-import ProjectDetails from "./pages/ProjectDetails";
+import ProjectWorkspace from "./pages/projects/ProjectWorkspace";
+import ProjectDetails from "./pages/projects/ProjectDetails";
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
       <LocationProvider>
         <NotificationProvider>
           <Routes>
+
             {/* =================================================
                 ENTRY
                 ================================================= */}
@@ -215,13 +217,14 @@ function App() {
             />
 
             {/* =================================================
-                FUTURE MODULES
+                FUTURE MODULES / FALLBACK
                 ================================================= */}
 
             <Route
               path="*"
               element={<Navigate to="/location" replace />}
             />
+
           </Routes>
         </NotificationProvider>
       </LocationProvider>

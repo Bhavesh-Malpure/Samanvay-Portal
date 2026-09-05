@@ -1,196 +1,171 @@
 import React from "react";
 
-const metrics = [
-  {
-    label: "Citizens Potentially Impacted",
-    value: "1,240",
-    description: "Estimated population in target areas",
-  },
-  {
-    label: "Target Locations",
-    value: "8",
-    description: "Locations identified for monitoring",
-  },
-  {
-    label: "Problems Addressed",
-    value: "12",
-    description: "Related electricity complaints",
-  },
-  {
-    label: "Expected Improvement",
-    value: "25%",
-    description: "Estimated improvement after deployment",
-  },
-];
-
 function ImpactMetrics() {
+  const metrics = [
+    {
+      label: "Citizens Potentially Impacted",
+      value: "1,240",
+      description: "Estimated citizens benefiting from improved monitoring.",
+    },
+    {
+      label: "Target Locations",
+      value: "8",
+      description: "Locations identified for monitoring.",
+    },
+    {
+      label: "Problems Addressed",
+      value: "12",
+      description: "Electricity-related issues targeted.",
+    },
+    {
+      label: "Expected Improvement",
+      value: "25%",
+      description: "Expected improvement in service reliability.",
+    },
+  ];
+
+  const impactAreas = [
+    {
+      title: "Reliability",
+      description:
+        "Better identification of electricity interruptions and voltage fluctuations.",
+    },
+    {
+      title: "Decision Making",
+      description:
+        "Data can help departments identify frequently affected locations.",
+    },
+    {
+      title: "Citizen Awareness",
+      description:
+        "Improved information about electricity-related issues.",
+    },
+    {
+      title: "Infrastructure",
+      description:
+        "Supports better planning of electricity infrastructure.",
+    },
+  ];
+
   return (
     <div>
-      <div style={styles.intro}>
-        <div>
-          <p style={styles.eyebrow}>SOCIAL IMPACT</p>
+      <h2 style={styles.title}>Impact Metrics</h2>
 
-          <h2 style={styles.title}>
-            Project Impact Metrics
-          </h2>
+      <p style={styles.description}>
+        Estimated societal impact of the Smart Electricity Monitoring
+        project in Dhule District.
+      </p>
 
-          <p style={styles.subtitle}>
-            Track the expected and measurable impact of the
-            project on the Dhule community.
-          </p>
-        </div>
-      </div>
-
-      <div style={styles.grid}>
+      {/* Metrics */}
+      <div style={styles.metricsGrid}>
         {metrics.map((metric) => (
-          <div key={metric.label} style={styles.card}>
-            <p style={styles.label}>{metric.label}</p>
+          <div key={metric.label} style={styles.metricCard}>
+            <div style={styles.metricLabel}>
+              {metric.label}
+            </div>
 
-            <h2 style={styles.value}>{metric.value}</h2>
+            <div style={styles.metricValue}>
+              {metric.value}
+            </div>
 
-            <p style={styles.description}>
+            <div style={styles.metricDescription}>
               {metric.description}
-            </p>
+            </div>
           </div>
         ))}
       </div>
 
-      <div style={styles.card}>
-        <h2 style={styles.sectionTitle}>
-          Impact Areas
-        </h2>
+      {/* Impact Areas */}
+      <div style={styles.section}>
+        <h3 style={styles.heading}>Impact Areas</h3>
 
         <div style={styles.impactGrid}>
-          <Impact
-            title="Reliability"
-            value="Improved"
-            text="Better visibility into recurring electricity interruptions."
-          />
+          {impactAreas.map((area) => (
+            <div key={area.title} style={styles.impact}>
+              <h4 style={styles.impactTitle}>
+                {area.title}
+              </h4>
 
-          <Impact
-            title="Decision Making"
-            value="Data Driven"
-            text="Authorities can use collected information for planning."
-          />
-
-          <Impact
-            title="Citizen Awareness"
-            value="Increased"
-            text="Citizens can receive clearer information about issues."
-          />
-
-          <Impact
-            title="Infrastructure"
-            value="Supported"
-            text="Problem patterns can help identify infrastructure priorities."
-          />
+              <p style={styles.impactText}>
+                {area.description}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
 
+      {/* Prototype Note */}
       <div style={styles.note}>
-        <strong>Prototype metric:</strong> These values are
-        synthetic demonstration data for the Samanvay Portal
-        prototype and are not real government measurements.
+        <strong>Prototype note:</strong> These impact values are
+        synthetic estimates created for the Samanvay Portal prototype.
+        Real impact metrics will be calculated from actual project
+        and government data after backend integration.
       </div>
-    </div>
-  );
-}
-
-function Impact({ title, value, text }) {
-  return (
-    <div style={styles.impact}>
-      <div style={styles.impactTop}>
-        <h3>{title}</h3>
-        <span>{value}</span>
-      </div>
-
-      <p>{text}</p>
     </div>
   );
 }
 
 const styles = {
-  intro: {
-    background: "#F7D6D0",
-    border: "1px solid #E2B4BD",
-    borderRadius: "16px",
-    padding: "22px",
-    marginBottom: "18px",
-  },
-
-  eyebrow: {
-    margin: "0 0 6px",
-    color: "#9B6670",
-    fontSize: "10px",
-    fontWeight: "800",
-    letterSpacing: "2px",
-  },
-
   title: {
-    margin: 0,
-    fontSize: "21px",
-  },
-
-  subtitle: {
-    margin: "7px 0 0",
-    color: "#666",
-    fontSize: "13px",
-  },
-
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(4, 1fr)",
-    gap: "15px",
-    marginBottom: "18px",
-  },
-
-  card: {
-    background: "#FFFFFF",
-    border: "1px solid #E2B4BD",
-    borderRadius: "16px",
-    padding: "20px",
-    marginBottom: "18px",
-  },
-
-  label: {
-    margin: 0,
-    fontSize: "12px",
-    color: "#777",
-    lineHeight: "1.4",
-  },
-
-  value: {
-    margin: "10px 0 5px",
-    fontSize: "29px",
+    margin: "0 0 8px",
+    fontSize: "23px",
+    color: "#4A4A4A",
   },
 
   description: {
     margin: 0,
-    color: "#999",
-    fontSize: "11px",
+    color: "#6F6064",
+    fontSize: "14px",
   },
 
-  sectionTitle: {
-    margin: "0 0 18px",
-    fontSize: "19px",
+  metricsGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+    gap: "14px",
+    marginTop: "25px",
+  },
+
+  metricCard: {
+    background: "#FFF5F5",
+    border: "1px solid #F0E1E1",
+    borderRadius: "10px",
+    padding: "18px",
+  },
+
+  metricLabel: {
+    fontSize: "12px",
+    color: "#7A696D",
+    lineHeight: "1.4",
+    minHeight: "34px",
+  },
+
+  metricValue: {
+    fontSize: "27px",
+    fontWeight: "700",
+    color: "#4A4A4A",
+    margin: "8px 0",
+  },
+
+  metricDescription: {
+    fontSize: "11px",
+    color: "#918085",
+    lineHeight: "1.5",
+  },
+
+  section: {
+    marginTop: "30px",
+  },
+
+  heading: {
+    margin: "0 0 14px",
+    fontSize: "18px",
+    color: "#4A4A4A",
   },
 
   impactGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
-    gap: "15px",
-  },
-
-  impact: {
-    background: "#FFF5F5",
-    borderRadius: "10px",
-    padding: "16px",
-  },
-
-  impactTop: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+    gap: "12px",
   },
 
   impact: {
@@ -200,13 +175,27 @@ const styles = {
     padding: "16px",
   },
 
-  note: {
-    background: "#4A4A4A",
-    color: "#FFF5F5",
-    padding: "15px",
-    borderRadius: "10px",
+  impactTitle: {
+    margin: "0 0 7px",
+    fontSize: "15px",
+    color: "#4A4A4A",
+  },
+
+  impactText: {
+    margin: 0,
     fontSize: "12px",
     lineHeight: "1.6",
+    color: "#7A696D",
+  },
+
+  note: {
+    marginTop: "25px",
+    background: "#F7D6D0",
+    borderRadius: "10px",
+    padding: "15px",
+    fontSize: "12px",
+    lineHeight: "1.6",
+    color: "#5F5256",
   },
 };
 

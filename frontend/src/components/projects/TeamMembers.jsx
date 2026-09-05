@@ -1,41 +1,40 @@
 import React, { useState } from "react";
 
-const initialMembers = [
-  {
-    name: "Rahul Patil",
-    role: "Team Lead",
-    year: "Final Year",
-    branch: "Computer Engineering",
-  },
-  {
-    name: "Sneha Mahale",
-    role: "Frontend Developer",
-    year: "Third Year",
-    branch: "Information Technology",
-  },
-  {
-    name: "Akash Chaudhari",
-    role: "Backend Developer",
-    year: "Third Year",
-    branch: "Computer Engineering",
-  },
-  {
-    name: "Pooja Shinde",
-    role: "Data Analyst",
-    year: "Third Year",
-    branch: "AI & Data Science",
-  },
-  {
-    name: "Om Deshmukh",
-    role: "Hardware Developer",
-    year: "Final Year",
-    branch: "Electronics Engineering",
-  },
-];
-
 function TeamMembers() {
-  const [members, setMembers] = useState(initialMembers);
-  const [showAdd, setShowAdd] = useState(false);
+  const [members, setMembers] = useState([
+    {
+      name: "Rahul Patil",
+      role: "Team Lead",
+      year: "3rd Year",
+      branch: "Computer Engineering",
+    },
+    {
+      name: "Sneha Mahale",
+      role: "Frontend Developer",
+      year: "3rd Year",
+      branch: "Information Technology",
+    },
+    {
+      name: "Akash Chaudhari",
+      role: "AI / Data",
+      year: "3rd Year",
+      branch: "Computer Engineering",
+    },
+    {
+      name: "Pooja Shinde",
+      role: "IoT Developer",
+      year: "3rd Year",
+      branch: "Electronics",
+    },
+    {
+      name: "Om Deshmukh",
+      role: "Backend Developer",
+      year: "3rd Year",
+      branch: "Information Technology",
+    },
+  ]);
+
+  const [showForm, setShowForm] = useState(false);
 
   const [newMember, setNewMember] = useState({
     name: "",
@@ -44,12 +43,28 @@ function TeamMembers() {
     branch: "",
   });
 
-  const addMember = () => {
-    if (!newMember.name || !newMember.role) {
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setNewMember((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  };
+
+  const addMember = (event) => {
+    event.preventDefault();
+
+    if (!newMember.name.trim()) {
       return;
     }
 
-    setMembers([...members, newMember]);
+    setMembers((current) => [
+      ...current,
+      {
+        ...newMember,
+      },
+    ]);
 
     setNewMember({
       name: "",
@@ -58,240 +73,309 @@ function TeamMembers() {
       branch: "",
     });
 
-    setShowAdd(false);
+    setShowForm(false);
   };
 
   return (
-    <div style={styles.card}>
+    <div>
       <div style={styles.header}>
         <div>
           <h2 style={styles.title}>Team Members</h2>
-          <p style={styles.subtitle}>
-            Students and mentors working on this project.
+
+          <p style={styles.description}>
+            Student members working on Smart Electricity Monitoring.
           </p>
         </div>
 
         <button
+          onClick={() => setShowForm(!showForm)}
           style={styles.addButton}
-          onClick={() => setShowAdd(!showAdd)}
         >
           + Add Member
         </button>
       </div>
 
-      {showAdd && (
-        <div style={styles.addBox}>
-          <input
-            placeholder="Student name"
-            value={newMember.name}
-            onChange={(e) =>
-              setNewMember({
-                ...newMember,
-                name: e.target.value,
-              })
-            }
-            style={styles.input}
-          />
+      {/* Faculty Mentor */}
+      <div style={styles.mentorCard}>
+        <div style={styles.avatar}>AP</div>
 
-          <input
-            placeholder="Role"
-            value={newMember.role}
-            onChange={(e) =>
-              setNewMember({
-                ...newMember,
-                role: e.target.value,
-              })
-            }
-            style={styles.input}
-          />
+        <div>
+          <div style={styles.mentorLabel}>Faculty Mentor</div>
 
-          <input
-            placeholder="Year"
-            value={newMember.year}
-            onChange={(e) =>
-              setNewMember({
-                ...newMember,
-                year: e.target.value,
-              })
-            }
-            style={styles.input}
-          />
+          <div style={styles.mentorName}>
+            Dr. Amit Patil
+          </div>
 
-          <input
-            placeholder="Branch"
-            value={newMember.branch}
-            onChange={(e) =>
-              setNewMember({
-                ...newMember,
-                branch: e.target.value,
-              })
-            }
-            style={styles.input}
-          />
-
-          <button
-            style={styles.saveButton}
-            onClick={addMember}
-          >
-            Add
-          </button>
+          <div style={styles.mentorDetails}>
+            Computer Engineering • IoT, AI & Smart Systems
+          </div>
         </div>
+      </div>
+
+      {/* Add Member Form */}
+      {showForm && (
+        <form onSubmit={addMember} style={styles.form}>
+          <h3 style={styles.formTitle}>Add Student Member</h3>
+
+          <div style={styles.formGrid}>
+            <input
+              name="name"
+              value={newMember.name}
+              onChange={handleChange}
+              placeholder="Student name"
+              style={styles.input}
+            />
+
+            <input
+              name="role"
+              value={newMember.role}
+              onChange={handleChange}
+              placeholder="Role"
+              style={styles.input}
+            />
+
+            <input
+              name="year"
+              value={newMember.year}
+              onChange={handleChange}
+              placeholder="Year"
+              style={styles.input}
+            />
+
+            <input
+              name="branch"
+              value={newMember.branch}
+              onChange={handleChange}
+              placeholder="Branch"
+              style={styles.input}
+            />
+          </div>
+
+          <div style={styles.formActions}>
+            <button
+              type="submit"
+              style={styles.saveButton}
+            >
+              Add Member
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              style={styles.cancelButton}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
       )}
 
-      <div>
+      {/* Members */}
+      <div style={styles.membersGrid}>
         {members.map((member, index) => (
-          <div key={index} style={styles.member}>
-            <div style={styles.avatar}>
-              {member.name.charAt(0).toUpperCase()}
+          <div key={index} style={styles.memberCard}>
+            <div style={styles.memberTop}>
+              <div style={styles.avatar}>
+                {getInitials(member.name)}
+              </div>
+
+              <span style={styles.memberRole}>
+                {member.role}
+              </span>
+            </div>
+
+            <h3 style={styles.memberName}>
+              {member.name}
+            </h3>
+
+            <div style={styles.memberInfo}>
+              {member.year}
             </div>
 
             <div style={styles.memberInfo}>
-              <h3>{member.name}</h3>
-              <p>{member.role}</p>
-            </div>
-
-            <div style={styles.memberDetails}>
-              <span>{member.year}</span>
-              <span>{member.branch}</span>
+              {member.branch}
             </div>
           </div>
         ))}
-      </div>
-
-      <div style={styles.mentor}>
-        <div style={styles.mentorAvatar}>A</div>
-
-        <div>
-          <span style={styles.mentorLabel}>FACULTY MENTOR</span>
-          <h3>Dr. Amit Patil</h3>
-          <p>Faculty Mentor • Dhule Engineering University</p>
-        </div>
       </div>
     </div>
   );
 }
 
-const styles = {
-  card: {
-    background: "#FFFFFF",
-    border: "1px solid #E2B4BD",
-    borderRadius: "16px",
-    padding: "24px",
-  },
+function getInitials(name) {
+  return name
+    .split(" ")
+    .map((word) => word.charAt(0))
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
+}
 
+const styles = {
   header: {
     display: "flex",
     justifyContent: "space-between",
+    alignItems: "flex-start",
+    gap: "15px",
     marginBottom: "20px",
   },
 
   title: {
-    margin: 0,
-    fontSize: "20px",
+    margin: "0 0 7px",
+    fontSize: "23px",
+    color: "#4A4A4A",
   },
 
-  subtitle: {
-    margin: "5px 0 0",
-    color: "#888",
-    fontSize: "13px",
+  description: {
+    margin: 0,
+    color: "#6F6064",
+    fontSize: "14px",
   },
 
   addButton: {
     border: "none",
-    background: "#4A4A4A",
-    color: "#FFF5F5",
-    padding: "9px 13px",
+    background: "#E2B4BD",
+    color: "#4A4A4A",
     borderRadius: "8px",
-    fontWeight: "700",
+    padding: "10px 15px",
+    fontSize: "13px",
+    fontWeight: "600",
     cursor: "pointer",
+    whiteSpace: "nowrap",
   },
 
-  addBox: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
-    gap: "10px",
-    padding: "15px",
+  mentorCard: {
+    display: "flex",
+    alignItems: "center",
+    gap: "14px",
     background: "#FFF5F5",
-    border: "1px solid #E2B4BD",
+    border: "1px solid #F0E1E1",
     borderRadius: "10px",
-    marginBottom: "18px",
+    padding: "16px",
+    marginBottom: "20px",
+  },
+
+  avatar: {
+    width: "42px",
+    height: "42px",
+    borderRadius: "50%",
+    background: "#E2B4BD",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "13px",
+    fontWeight: "700",
+    color: "#4A4A4A",
+    flexShrink: 0,
+  },
+
+  mentorLabel: {
+    fontSize: "11px",
+    color: "#8A777B",
+    marginBottom: "3px",
+  },
+
+  mentorName: {
+    fontSize: "16px",
+    fontWeight: "700",
+  },
+
+  mentorDetails: {
+    fontSize: "12px",
+    color: "#7A696D",
+    marginTop: "3px",
+  },
+
+  form: {
+    background: "#FFF5F5",
+    border: "1px solid #F0E1E1",
+    borderRadius: "10px",
+    padding: "18px",
+    marginBottom: "20px",
+  },
+
+  formTitle: {
+    margin: "0 0 15px",
+    fontSize: "16px",
+  },
+
+  formGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+    gap: "10px",
   },
 
   input: {
-    padding: "9px",
-    border: "1px solid #E2B4BD",
+    border: "1px solid #E2C7CB",
     borderRadius: "7px",
+    padding: "10px",
+    outline: "none",
+    fontSize: "13px",
     background: "#FFFFFF",
     boxSizing: "border-box",
+    width: "100%",
+  },
+
+  formActions: {
+    display: "flex",
+    gap: "8px",
+    marginTop: "12px",
   },
 
   saveButton: {
     border: "none",
-    background: "#4A4A4A",
-    color: "#FFF5F5",
+    background: "#E2B4BD",
+    padding: "9px 14px",
     borderRadius: "7px",
-    fontWeight: "700",
+    cursor: "pointer",
+    fontWeight: "600",
+  },
+
+  cancelButton: {
+    border: "1px solid #E2C7CB",
+    background: "#FFFFFF",
+    padding: "9px 14px",
+    borderRadius: "7px",
     cursor: "pointer",
   },
 
-  member: {
-    display: "flex",
-    alignItems: "center",
-    gap: "13px",
-    padding: "15px 0",
-    borderTop: "1px solid #F0E1E1",
+  membersGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+    gap: "14px",
   },
 
-  avatar: {
-    width: "40px",
-    height: "40px",
-    borderRadius: "50%",
-    background: "#F7D6D0",
+  memberCard: {
+    background: "#FFFFFF",
+    border: "1px solid #F0E1E1",
+    borderRadius: "10px",
+    padding: "16px",
+  },
+
+  memberTop: {
     display: "flex",
+    justifyContent: "space-between",
     alignItems: "center",
-    justifyContent: "center",
-    fontWeight: "800",
+    gap: "10px",
+  },
+
+  memberRole: {
+    fontSize: "10px",
+    background: "#F7D6D0",
+    borderRadius: "15px",
+    padding: "5px 8px",
+    color: "#6F6064",
+  },
+
+  memberName: {
+    margin: "14px 0 8px",
+    fontSize: "16px",
   },
 
   memberInfo: {
-    flex: 1,
-  },
-
-  memberDetails: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-end",
-    gap: "4px",
-    color: "#888",
-    fontSize: "11px",
-  },
-
-  mentor: {
-    display: "flex",
-    gap: "14px",
-    alignItems: "center",
-    marginTop: "15px",
-    padding: "17px",
-    background: "#F7D6D0",
-    borderRadius: "10px",
-  },
-
-  mentorAvatar: {
-    width: "42px",
-    height: "42px",
-    borderRadius: "50%",
-    background: "#4A4A4A",
-    color: "#FFF5F5",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontWeight: "800",
-  },
-
-  mentorLabel: {
-    color: "#9B6670",
-    fontSize: "10px",
-    fontWeight: "800",
+    fontSize: "12px",
+    color: "#7A696D",
+    marginTop: "4px",
   },
 };
 

@@ -1,49 +1,47 @@
 import React, { useState } from "react";
 
-const initialMilestones = [
-  {
-    id: 1,
-    title: "Problem Analysis",
-    description: "Study the electricity interruption problem.",
-    status: "Completed",
-    progress: 100,
-  },
-  {
-    id: 2,
-    title: "Requirement Gathering",
-    description: "Identify technical and user requirements.",
-    status: "Completed",
-    progress: 100,
-  },
-  {
-    id: 3,
-    title: "Prototype Development",
-    description: "Develop the initial monitoring prototype.",
-    status: "Completed",
-    progress: 100,
-  },
-  {
-    id: 4,
-    title: "Field Testing",
-    description: "Test the prototype in selected Dhule locations.",
-    status: "In Progress",
-    progress: 65,
-  },
-  {
-    id: 5,
-    title: "Final Deployment",
-    description: "Prepare the solution for practical deployment.",
-    status: "Pending",
-    progress: 0,
-  },
-];
-
 function Milestones() {
-  const [milestones, setMilestones] = useState(initialMilestones);
+  const [milestones, setMilestones] = useState([
+    {
+      id: 1,
+      title: "Problem Analysis",
+      description: "Study the electricity-related societal problem.",
+      status: "Completed",
+      progress: 100,
+    },
+    {
+      id: 2,
+      title: "Requirement Gathering",
+      description: "Identify technical and field requirements.",
+      status: "Completed",
+      progress: 100,
+    },
+    {
+      id: 3,
+      title: "Prototype Development",
+      description: "Develop the initial IoT monitoring prototype.",
+      status: "Completed",
+      progress: 100,
+    },
+    {
+      id: 4,
+      title: "Field Testing",
+      description: "Test the prototype at selected Dhule locations.",
+      status: "In Progress",
+      progress: 65,
+    },
+    {
+      id: 5,
+      title: "Final Deployment",
+      description: "Prepare the system for final deployment.",
+      status: "Pending",
+      progress: 0,
+    },
+  ]);
 
   const markComplete = (id) => {
-    setMilestones(
-      milestones.map((milestone) =>
+    setMilestones((current) =>
+      current.map((milestone) =>
         milestone.id === id
           ? {
               ...milestone,
@@ -56,69 +54,64 @@ function Milestones() {
   };
 
   return (
-    <div style={styles.card}>
-      <div style={styles.header}>
-        <div>
-          <h2 style={styles.title}>Project Milestones</h2>
-          <p style={styles.subtitle}>
-            Track important stages of project development.
-          </p>
-        </div>
+    <div>
+      <h2 style={styles.title}>Project Milestones</h2>
 
-        <span style={styles.count}>
-          {milestones.filter(
-            (item) => item.status === "Completed"
-          ).length}{" "}
-          / {milestones.length} completed
-        </span>
-      </div>
+      <p style={styles.description}>
+        Track the major stages of the project from problem analysis
+        to final deployment.
+      </p>
 
-      <div>
+      <div style={styles.timeline}>
         {milestones.map((milestone, index) => (
           <div key={milestone.id} style={styles.milestone}>
-            <div style={styles.timeline}>
+            <div style={styles.timelineLeft}>
               <div
                 style={{
                   ...styles.circle,
-                  background:
-                    milestone.status === "Completed"
-                      ? "#4A4A4A"
-                      : "#F7D6D0",
-                  color:
-                    milestone.status === "Completed"
-                      ? "#FFF5F5"
-                      : "#4A4A4A",
+                  ...(milestone.status === "Completed"
+                    ? styles.completedCircle
+                    : {}),
                 }}
               >
                 {milestone.status === "Completed"
                   ? "✓"
-                  : milestone.id}
+                  : index + 1}
               </div>
 
-              {index < milestones.length - 1 && (
+              {index !== milestones.length - 1 && (
                 <div style={styles.line} />
               )}
             </div>
 
-            <div style={styles.content}>
-              <div style={styles.top}>
+            <div style={styles.milestoneCard}>
+              <div style={styles.cardHeader}>
                 <div>
                   <h3 style={styles.milestoneTitle}>
                     {milestone.title}
                   </h3>
 
-                  <p style={styles.description}>
+                  <p style={styles.milestoneDescription}>
                     {milestone.description}
                   </p>
                 </div>
 
-                <span style={styles.status}>
+                <span
+                  style={{
+                    ...styles.status,
+                    ...(milestone.status === "Completed"
+                      ? styles.completedStatus
+                      : milestone.status === "In Progress"
+                      ? styles.progressStatus
+                      : styles.pendingStatus),
+                  }}
+                >
                   {milestone.status}
                 </span>
               </div>
 
               <div style={styles.progressRow}>
-                <div style={styles.progressBar}>
+                <div style={styles.progressBackground}>
                   <div
                     style={{
                       ...styles.progressFill,
@@ -127,16 +120,24 @@ function Milestones() {
                   />
                 </div>
 
-                <span>{milestone.progress}%</span>
+                <span style={styles.progressText}>
+                  {milestone.progress}%
+                </span>
               </div>
 
-              {milestone.status !== "Completed" && (
+              {milestone.status === "In Progress" && (
                 <button
-                  style={styles.completeButton}
                   onClick={() => markComplete(milestone.id)}
+                  style={styles.completeButton}
                 >
                   Mark Complete
                 </button>
+              )}
+
+              {milestone.status === "Pending" && (
+                <span style={styles.pendingText}>
+                  This milestone has not started yet.
+                </span>
               )}
             </div>
           </div>
@@ -147,113 +148,119 @@ function Milestones() {
 }
 
 const styles = {
-  card: {
-    background: "#FFFFFF",
-    border: "1px solid #E2B4BD",
-    borderRadius: "16px",
-    padding: "24px",
-  },
-
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginBottom: "25px",
-  },
-
   title: {
+    margin: "0 0 8px",
+    fontSize: "23px",
+    color: "#4A4A4A",
+  },
+
+  description: {
     margin: 0,
-    fontSize: "20px",
+    color: "#6F6064",
+    fontSize: "14px",
   },
 
-  subtitle: {
-    margin: "5px 0 0",
-    color: "#888",
-    fontSize: "13px",
-  },
-
-  count: {
-    background: "#F7D6D0",
-    padding: "7px 11px",
-    borderRadius: "10px",
-    fontSize: "11px",
-    fontWeight: "700",
-    height: "fit-content",
+  timeline: {
+    marginTop: "25px",
   },
 
   milestone: {
     display: "flex",
-    gap: "16px",
+    gap: "15px",
   },
 
-  timeline: {
+  timelineLeft: {
+    width: "35px",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    width: "30px",
   },
 
   circle: {
     width: "30px",
     height: "30px",
     borderRadius: "50%",
+    background: "#F7D6D0",
+    color: "#6F6064",
     display: "flex",
-    alignItems: "center",
     justifyContent: "center",
-    fontSize: "11px",
-    fontWeight: "800",
+    alignItems: "center",
+    fontSize: "12px",
+    fontWeight: "700",
     flexShrink: 0,
+  },
+
+  completedCircle: {
+    background: "#E2B4BD",
+    color: "#4A4A4A",
   },
 
   line: {
     width: "2px",
     flex: 1,
-    minHeight: "70px",
-    background: "#E2B4BD",
+    minHeight: "45px",
+    background: "#F0D6DA",
   },
 
-  content: {
+  milestoneCard: {
     flex: 1,
-    paddingBottom: "28px",
+    background: "#FFF5F5",
+    border: "1px solid #F0E1E1",
+    borderRadius: "10px",
+    padding: "16px",
+    marginBottom: "15px",
   },
 
-  top: {
+  cardHeader: {
     display: "flex",
     justifyContent: "space-between",
-    gap: "20px",
+    gap: "15px",
   },
 
   milestoneTitle: {
     margin: 0,
     fontSize: "16px",
+    color: "#4A4A4A",
   },
 
-  description: {
-    margin: "5px 0 12px",
-    color: "#888",
-    fontSize: "12px",
+  milestoneDescription: {
+    margin: "5px 0 0",
+    fontSize: "13px",
+    color: "#7A696D",
   },
 
   status: {
     height: "fit-content",
-    background: "#FFF5F5",
-    border: "1px solid #E2B4BD",
-    padding: "5px 8px",
-    borderRadius: "10px",
-    fontSize: "10px",
-    fontWeight: "700",
+    padding: "5px 10px",
+    borderRadius: "15px",
+    fontSize: "11px",
+    fontWeight: "600",
     whiteSpace: "nowrap",
+  },
+
+  completedStatus: {
+    background: "#E2B4BD",
+  },
+
+  progressStatus: {
+    background: "#F7D6D0",
+  },
+
+  pendingStatus: {
+    background: "#EEEEEE",
+    color: "#777777",
   },
 
   progressRow: {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-    fontSize: "11px",
+    marginTop: "15px",
   },
 
-  progressBar: {
-    height: "7px",
+  progressBackground: {
     flex: 1,
+    height: "7px",
     background: "#F7D6D0",
     borderRadius: "10px",
     overflow: "hidden",
@@ -261,18 +268,33 @@ const styles = {
 
   progressFill: {
     height: "100%",
-    background: "#4A4A4A",
+    background: "#E2B4BD",
+    borderRadius: "10px",
+  },
+
+  progressText: {
+    fontSize: "12px",
+    color: "#7A696D",
+    width: "35px",
   },
 
   completeButton: {
-    marginTop: "10px",
-    border: "1px solid #E2B4BD",
-    background: "#FFF5F5",
-    padding: "6px 10px",
+    marginTop: "12px",
+    border: "none",
+    background: "#E2B4BD",
+    color: "#4A4A4A",
     borderRadius: "7px",
-    fontSize: "11px",
-    fontWeight: "700",
+    padding: "8px 12px",
+    fontSize: "12px",
+    fontWeight: "600",
     cursor: "pointer",
+  },
+
+  pendingText: {
+    display: "block",
+    marginTop: "10px",
+    fontSize: "12px",
+    color: "#918085",
   },
 };
 

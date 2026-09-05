@@ -1,176 +1,118 @@
 import React from "react";
 
 function ProjectOverview() {
+  const objectives = [
+    "Monitor electricity interruptions in real time.",
+    "Track voltage fluctuations in selected locations.",
+    "Identify frequently affected areas.",
+    "Support government decision-making using collected data.",
+    "Improve reliability of electricity services.",
+  ];
+
   return (
     <div>
-      <div style={styles.grid}>
-        <div style={styles.card}>
-          <p style={styles.label}>PROJECT DESCRIPTION</p>
+      <h2 style={styles.title}>Project Overview</h2>
 
-          <h2 style={styles.title}>
-            Smart Electricity Monitoring
-          </h2>
+      <p style={styles.description}>
+        Smart Electricity Monitoring is an IoT-based project designed
+        to monitor electricity interruptions and voltage fluctuations
+        in Dhule City. The project aims to provide useful information
+        for identifying frequently affected locations and supporting
+        better infrastructure decisions.
+      </p>
 
-          <p style={styles.text}>
-            A technology-driven solution designed to monitor
-            electricity interruptions and generate useful insights
-            for local authorities and citizens in Dhule.
-          </p>
+      {/* Progress */}
+      <div style={styles.section}>
+        <div style={styles.sectionHeader}>
+          <h3 style={styles.heading}>Overall Progress</h3>
+          <strong style={styles.percentage}>72%</strong>
         </div>
 
-        <div style={styles.card}>
-          <p style={styles.label}>CURRENT STATUS</p>
-
-          <div style={styles.statusRow}>
-            <strong>72%</strong>
-            <span>Overall completion</span>
-          </div>
-
-          <div style={styles.progressBar}>
-            <div
-              style={{
-                ...styles.progressFill,
-                width: "72%",
-              }}
-            />
-          </div>
-
-          <p style={styles.smallText}>
-            Development and field testing are currently underway.
-          </p>
-        </div>
-      </div>
-
-      <div style={styles.card}>
-        <h2 style={styles.sectionTitle}>
-          Project Objectives
-        </h2>
-
-        <div style={styles.objectiveGrid}>
-          <Objective
-            number="01"
-            title="Monitor"
-            text="Collect electricity interruption information."
-          />
-
-          <Objective
-            number="02"
-            title="Analyse"
-            text="Identify patterns and recurring issues."
-          />
-
-          <Objective
-            number="03"
-            title="Inform"
-            text="Provide useful information to stakeholders."
-          />
-
-          <Objective
-            number="04"
-            title="Improve"
-            text="Support better local infrastructure decisions."
+        <div style={styles.progressBackground}>
+          <div
+            style={{
+              ...styles.progressFill,
+              width: "72%",
+            }}
           />
         </div>
       </div>
 
-      <div style={styles.card}>
-        <h2 style={styles.sectionTitle}>
-          Current Project Activity
-        </h2>
+      {/* Objectives */}
+      <div style={styles.section}>
+        <h3 style={styles.heading}>Objectives</h3>
 
-        <div style={styles.activity}>
-          <span style={styles.dot} />
-          <div>
-            <strong>Field testing started</strong>
-            <p>Testing the monitoring prototype in Dhule City.</p>
-          </div>
-          <span style={styles.date}>Today</span>
-        </div>
+        <div style={styles.objectives}>
+          {objectives.map((objective, index) => (
+            <div key={index} style={styles.objective}>
+              <div style={styles.number}>{index + 1}</div>
 
-        <div style={styles.activity}>
-          <span style={styles.dot} />
-          <div>
-            <strong>Prototype updated</strong>
-            <p>Sensor data processing module was improved.</p>
-          </div>
-          <span style={styles.date}>2 days ago</span>
-        </div>
-
-        <div style={styles.activity}>
-          <span style={styles.dot} />
-          <div>
-            <strong>Industry review completed</strong>
-            <p>Technical feedback received from industry mentor.</p>
-          </div>
-          <span style={styles.date}>5 days ago</span>
+              <div style={styles.objectiveText}>
+                {objective}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-    </div>
-  );
-}
 
-function Objective({ number, title, text }) {
-  return (
-    <div style={styles.objective}>
-      <span style={styles.number}>{number}</span>
+      {/* Current Activity */}
+      <div style={styles.activity}>
+        <h3 style={styles.heading}>Current Activity</h3>
 
-      <div>
-        <h3>{title}</h3>
-        <p>{text}</p>
+        <p style={styles.activityText}>
+          The team is currently conducting field testing of the
+          electricity monitoring prototype at selected locations
+          in Dhule City.
+        </p>
+
+        <div style={styles.activityMeta}>
+          Last updated: 02 September 2026
+        </div>
       </div>
     </div>
   );
 }
 
 const styles = {
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "1.4fr 1fr",
-    gap: "18px",
-    marginBottom: "18px",
-  },
-
-  card: {
-    background: "#FFFFFF",
-    border: "1px solid #E2B4BD",
-    borderRadius: "16px",
-    padding: "22px",
-    marginBottom: "18px",
-  },
-
-  label: {
-    margin: "0 0 8px",
-    color: "#9B6670",
-    fontSize: "10px",
-    fontWeight: "800",
-    letterSpacing: "1.5px",
-  },
-
   title: {
-    margin: "0 0 10px",
-    fontSize: "21px",
+    margin: "0 0 12px",
+    fontSize: "23px",
+    color: "#4A4A4A",
   },
 
-  text: {
+  description: {
     margin: 0,
-    color: "#666",
+    color: "#6F6064",
     lineHeight: "1.7",
     fontSize: "14px",
+    maxWidth: "900px",
   },
 
-  statusRow: {
+  section: {
+    marginTop: "28px",
+  },
+
+  sectionHeader: {
     display: "flex",
-    alignItems: "baseline",
-    gap: "10px",
-    marginBottom: "12px",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: "10px",
   },
 
-  statusRowStrong: {
-    fontSize: "30px",
+  heading: {
+    margin: 0,
+    fontSize: "17px",
+    color: "#4A4A4A",
   },
 
-  progressBar: {
-    height: "9px",
+  percentage: {
+    fontSize: "20px",
+    color: "#7E3545",
+  },
+
+  progressBackground: {
+    width: "100%",
+    height: "10px",
     background: "#F7D6D0",
     borderRadius: "10px",
     overflow: "hidden",
@@ -178,62 +120,62 @@ const styles = {
 
   progressFill: {
     height: "100%",
-    background: "#4A4A4A",
+    background: "#E2B4BD",
+    borderRadius: "10px",
   },
 
-  smallText: {
-    fontSize: "12px",
-    color: "#888",
-    margin: "10px 0 0",
-  },
-
-  sectionTitle: {
-    margin: "0 0 18px",
-    fontSize: "19px",
-  },
-
-  objectiveGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
-    gap: "15px",
+  objectives: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+    marginTop: "12px",
   },
 
   objective: {
     display: "flex",
+    alignItems: "center",
     gap: "12px",
-    padding: "15px",
     background: "#FFF5F5",
-    borderRadius: "10px",
+    borderRadius: "9px",
+    padding: "12px",
   },
 
   number: {
-    color: "#9B6670",
-    fontWeight: "800",
-    fontSize: "12px",
-  },
-
-  activity: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: "12px",
-    padding: "15px 0",
-    borderTop: "1px solid #F0E1E1",
-  },
-
-  dot: {
-    width: "9px",
-    height: "9px",
+    width: "28px",
+    height: "28px",
     borderRadius: "50%",
-    background: "#4A4A4A",
-    marginTop: "5px",
+    background: "#E2B4BD",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "12px",
+    fontWeight: "700",
     flexShrink: 0,
   },
 
-  date: {
-    marginLeft: "auto",
-    fontSize: "11px",
-    color: "#999",
-    whiteSpace: "nowrap",
+  objectiveText: {
+    fontSize: "14px",
+    color: "#5F5256",
+  },
+
+  activity: {
+    marginTop: "28px",
+    background: "#FFF5F5",
+    border: "1px solid #F0E1E1",
+    borderRadius: "10px",
+    padding: "18px",
+  },
+
+  activityText: {
+    fontSize: "14px",
+    lineHeight: "1.6",
+    color: "#6F6064",
+    margin: "10px 0",
+  },
+
+  activityMeta: {
+    fontSize: "12px",
+    color: "#918085",
   },
 };
 

@@ -4,123 +4,146 @@ import { useNavigate } from "react-router-dom";
 function ProjectDetails() {
   const navigate = useNavigate();
 
+  const project = {
+    id: "SAM-PROJ-001",
+    title: "Smart Electricity Monitoring",
+    category: "Electricity",
+    location: "Dhule City",
+    priority: "High",
+    status: "In Progress",
+
+    problem:
+      "Residents of Dhule City are experiencing frequent electricity interruptions and voltage fluctuations, affecting homes, educational institutions and small businesses.",
+
+    solution:
+      "Develop an IoT-based electricity monitoring system that collects real-time information about power interruptions and voltage variations and provides useful information for decision-making.",
+
+    objectives: [
+      "Monitor electricity interruptions in real time.",
+      "Track voltage fluctuations across selected locations.",
+      "Identify frequently affected areas.",
+      "Provide useful data to government departments.",
+      "Improve electricity service reliability.",
+    ],
+
+    university: "North Maharashtra Institute of Technology",
+    faculty: "Dr. Amit Patil",
+    team: "Team Volt",
+    industry: "Dhule Industrial Solutions Pvt. Ltd.",
+  };
+
   return (
     <div style={styles.page}>
-      <div style={styles.container}>
-        <button
-          style={styles.backButton}
-          onClick={() => navigate(-1)}
-        >
-          ← Back
-        </button>
+      <button
+        onClick={() => navigate(-1)}
+        style={styles.backButton}
+      >
+        ← Back
+      </button>
 
-        <div style={styles.header}>
-          <div>
-            <p style={styles.eyebrow}>PROJECT DETAILS</p>
+      <div style={styles.header}>
+        <div>
+          <div style={styles.category}>{project.category}</div>
 
-            <h1 style={styles.title}>
-              Smart Electricity Monitoring
-            </h1>
+          <h1 style={styles.title}>{project.title}</h1>
 
-            <p style={styles.subtitle}>
-              SAM-PROJ-001 • Dhule City • Electricity
-            </p>
+          <div style={styles.meta}>
+            <span>{project.id}</span>
+            <span>•</span>
+            <span>{project.location}</span>
           </div>
+        </div>
 
-          <span style={styles.status}>
-            In Progress
+        <div style={styles.statusContainer}>
+          <span style={styles.priorityBadge}>
+            {project.priority} Priority
+          </span>
+
+          <span style={styles.statusBadge}>
+            {project.status}
           </span>
         </div>
+      </div>
 
-        <div style={styles.grid}>
-          <div style={styles.mainCard}>
-            <h2 style={styles.sectionTitle}>
-              Societal Problem
-            </h2>
+      <div style={styles.grid}>
+        <section style={styles.card}>
+          <h2 style={styles.sectionTitle}>Societal Problem</h2>
 
-            <p style={styles.text}>
-              Frequent electricity interruptions are affecting
-              households, small businesses and public facilities
-              across selected areas of Dhule City.
-            </p>
+          <p style={styles.paragraph}>{project.problem}</p>
+        </section>
 
-            <h2 style={styles.sectionTitle}>
-              Proposed Solution
-            </h2>
+        <section style={styles.card}>
+          <h2 style={styles.sectionTitle}>Proposed Solution</h2>
 
-            <p style={styles.text}>
-              The student team is developing a smart electricity
-              monitoring system capable of collecting interruption
-              data, identifying patterns and providing useful
-              information for authorities and citizens.
-            </p>
+          <p style={styles.paragraph}>{project.solution}</p>
+        </section>
+      </div>
 
-            <h2 style={styles.sectionTitle}>
-              Project Objective
-            </h2>
+      <section style={styles.card}>
+        <h2 style={styles.sectionTitle}>Project Objectives</h2>
 
-            <ul style={styles.list}>
-              <li>Monitor electricity interruptions.</li>
-              <li>Identify recurring interruption patterns.</li>
-              <li>Generate useful reports.</li>
-              <li>Support evidence-based decision making.</li>
-              <li>Improve citizen awareness.</li>
-            </ul>
-          </div>
+        <ul style={styles.list}>
+          {project.objectives.map((objective, index) => (
+            <li key={index} style={styles.listItem}>
+              {objective}
+            </li>
+          ))}
+        </ul>
+      </section>
 
-          <div>
-            <div style={styles.infoCard}>
-              <h2 style={styles.sectionTitle}>
-                Project Information
-              </h2>
+      <section style={styles.card}>
+        <h2 style={styles.sectionTitle}>Project Information</h2>
 
-              <Info label="Project ID" value="SAM-PROJ-001" />
-              <Info label="Category" value="Electricity" />
-              <Info label="Location" value="Dhule City" />
-              <Info label="Priority" value="High" />
-              <Info
-                label="Status"
-                value="In Progress"
-              />
-            </div>
+        <div style={styles.infoGrid}>
+          <InfoItem
+            label="University"
+            value={project.university}
+          />
 
-            <div style={styles.infoCard}>
-              <h2 style={styles.sectionTitle}>
-                Team
-              </h2>
+          <InfoItem
+            label="Faculty Mentor"
+            value={project.faculty}
+          />
 
-              <Info label="Team" value="Team Volt" />
-              <Info
-                label="University"
-                value="Dhule Engineering University"
-              />
-              <Info
-                label="Faculty Mentor"
-                value="Dr. Amit Patil"
-              />
-              <Info label="Members" value="5 Students" />
-            </div>
+          <InfoItem
+            label="Student Team"
+            value={project.team}
+          />
 
-            <button
-              style={styles.workspaceButton}
-              onClick={() =>
-                navigate("/project-workspace")
-              }
-            >
-              Open Project Workspace →
-            </button>
-          </div>
+          <InfoItem
+            label="Industry Partner"
+            value={project.industry}
+          />
+
+          <InfoItem
+            label="Category"
+            value={project.category}
+          />
+
+          <InfoItem
+            label="Location"
+            value={project.location}
+          />
         </div>
+      </section>
+
+      <div style={styles.actionContainer}>
+        <button
+          onClick={() => navigate("/project-workspace")}
+          style={styles.primaryButton}
+        >
+          Open Project Workspace →
+        </button>
       </div>
     </div>
   );
 }
 
-function Info({ label, value }) {
+function InfoItem({ label, value }) {
   return (
-    <div style={styles.infoRow}>
-      <span>{label}</span>
-      <strong>{value}</strong>
+    <div style={styles.infoItem}>
+      <div style={styles.infoLabel}>{label}</div>
+      <div style={styles.infoValue}>{value}</div>
     </div>
   );
 }
@@ -129,119 +152,156 @@ const styles = {
   page: {
     minHeight: "100vh",
     background: "#FFF5F5",
-    color: "#4A4A4A",
-    padding: "32px",
+    padding: "30px",
     boxSizing: "border-box",
-  },
-
-  container: {
-    maxWidth: "1150px",
-    margin: "0 auto",
+    color: "#4A4A4A",
   },
 
   backButton: {
     border: "none",
     background: "transparent",
-    color: "#777",
-    fontWeight: "700",
+    color: "#6F6064",
     cursor: "pointer",
-    padding: 0,
-    marginBottom: "20px",
+    fontSize: "14px",
+    padding: "0",
+    marginBottom: "25px",
   },
 
   header: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-start",
+    gap: "20px",
     marginBottom: "25px",
   },
 
-  eyebrow: {
-    margin: 0,
-    color: "#9B6670",
-    fontSize: "11px",
-    fontWeight: "800",
-    letterSpacing: "2px",
+  category: {
+    display: "inline-block",
+    background: "#F7D6D0",
+    padding: "6px 12px",
+    borderRadius: "20px",
+    fontSize: "12px",
+    fontWeight: "600",
+    marginBottom: "10px",
   },
 
   title: {
-    margin: "7px 0",
-    fontSize: "31px",
+    margin: 0,
+    fontSize: "32px",
+    color: "#4A4A4A",
   },
 
-  subtitle: {
-    margin: 0,
-    color: "#888",
+  meta: {
+    display: "flex",
+    gap: "8px",
+    marginTop: "10px",
+    color: "#7A696D",
     fontSize: "14px",
   },
 
-  status: {
+  statusContainer: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "8px",
+    alignItems: "flex-end",
+  },
+
+  priorityBadge: {
     background: "#F7D6D0",
-    border: "1px solid #E2B4BD",
-    padding: "9px 14px",
+    color: "#7E3545",
+    padding: "8px 14px",
     borderRadius: "20px",
     fontSize: "12px",
-    fontWeight: "800",
+    fontWeight: "600",
+  },
+
+  statusBadge: {
+    background: "#E2B4BD",
+    color: "#4A4A4A",
+    padding: "8px 14px",
+    borderRadius: "20px",
+    fontSize: "12px",
+    fontWeight: "600",
   },
 
   grid: {
     display: "grid",
-    gridTemplateColumns: "1.6fr 1fr",
-    gap: "22px",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    gap: "18px",
   },
 
-  mainCard: {
+  card: {
     background: "#FFFFFF",
-    border: "1px solid #E2B4BD",
-    borderRadius: "16px",
-    padding: "25px",
-  },
-
-  infoCard: {
-    background: "#FFFFFF",
-    border: "1px solid #E2B4BD",
-    borderRadius: "16px",
-    padding: "20px",
+    border: "1px solid #F0E1E1",
+    borderRadius: "12px",
+    padding: "22px",
     marginBottom: "18px",
+    boxSizing: "border-box",
   },
 
   sectionTitle: {
-    margin: "0 0 12px",
-    fontSize: "18px",
+    margin: "0 0 14px",
+    fontSize: "19px",
+    color: "#4A4A4A",
   },
 
-  text: {
-    margin: "0 0 25px",
-    color: "#666",
-    lineHeight: "1.7",
+  paragraph: {
+    margin: 0,
     fontSize: "14px",
+    lineHeight: "1.7",
+    color: "#6F6064",
   },
 
   list: {
     margin: 0,
     paddingLeft: "20px",
-    color: "#666",
-    lineHeight: "1.9",
+  },
+
+  listItem: {
+    marginBottom: "10px",
     fontSize: "14px",
+    color: "#6F6064",
+    lineHeight: "1.5",
   },
 
-  infoRow: {
+  infoGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+    gap: "18px",
+  },
+
+  infoItem: {
+    background: "#FFF5F5",
+    borderRadius: "10px",
+    padding: "15px",
+  },
+
+  infoLabel: {
+    fontSize: "12px",
+    color: "#8A777B",
+    marginBottom: "5px",
+  },
+
+  infoValue: {
+    fontSize: "14px",
+    fontWeight: "600",
+    color: "#4A4A4A",
+  },
+
+  actionContainer: {
     display: "flex",
-    justifyContent: "space-between",
-    gap: "15px",
-    padding: "12px 0",
-    borderTop: "1px solid #F0E1E1",
-    fontSize: "13px",
+    justifyContent: "center",
+    marginTop: "10px",
   },
 
-  workspaceButton: {
-    width: "100%",
+  primaryButton: {
     border: "none",
-    background: "#4A4A4A",
-    color: "#FFF5F5",
-    padding: "13px",
+    background: "#E2B4BD",
+    color: "#4A4A4A",
+    padding: "13px 22px",
     borderRadius: "9px",
-    fontWeight: "800",
+    fontSize: "14px",
+    fontWeight: "700",
     cursor: "pointer",
   },
 };
