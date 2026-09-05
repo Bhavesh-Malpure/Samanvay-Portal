@@ -531,11 +531,21 @@ The current prototype focuses on Dhule District, but the architecture is designe
 
 ## 👨‍💻 Team
 
-# Team Samanvay
+# Avinya
 
 **Samanvay Portal — SIH 2026**
 
 > *Building a bridge between society's problems and the people capable of solving them.*
+
+### Team Members
+
+| Member | Role | Profile |
+| ------------------- | -------------------------------- | -------------------------------- |
+| **Bhavesh Malpure** | Frontend, Backend & AI | [GitHub Profile](YOUR_PROFILE_URL) |
+| **Prabha Jadhav** | Team Lead, Documentation | [GitHub Profile](https://github.com/prabhajadhav2006) |
+| **Yash Birari** | Backend, AI | [GitHub Profile](https://github.com/Yashbirari2006) |
+| **Pranav Patil** | Documentation | [GitHub Profile](https://github.com/pranav8599) |
+| **Kartikesh Patil** | — | — |
 
 ---
 
