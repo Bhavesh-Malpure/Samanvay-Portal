@@ -18,6 +18,7 @@ from app.models.problem import Problem
 from app.models.problem_status_history import ProblemStatusHistory
 from app.models.user import User
 from app.schemas.problem import ProblemResponse
+from app.models.notification import Notification
 
 
 router = APIRouter(
@@ -225,6 +226,26 @@ async def create_problem(
                 saved_image_paths.append(relative_path)
 
         problem.images = saved_image_paths
+                # ----------------------------------------------------
+        # Create notification for citizen
+        # ----------------------------------------------------
+
+        notification = Notification(
+            user_id=current_user.id,
+            title="Problem Submitted",
+            message=(
+                f'Your problem "{problem.title}" has been '
+                "successfully submitted."
+            ),
+            type="PROBLEM_UPDATE",
+            is_read=False,
+        )
+
+        db.add(notification)
+
+
+
+
 
         # ----------------------------------------------------
         # Final database commit

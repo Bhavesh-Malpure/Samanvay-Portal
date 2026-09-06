@@ -15,9 +15,9 @@ router = APIRouter(
 )
 
 
-# ============================================================
-# GOVERNMENT ROLE CHECK
-# ============================================================
+# =========================================================
+# GOVERNMENT ACCESS CHECK
+# =========================================================
 
 def require_government(
     current_user: User = Depends(get_current_user),
@@ -31,9 +31,31 @@ def require_government(
     return current_user
 
 
-# ============================================================
+# =========================================================
+# GET ALL PROBLEMS
+# =========================================================
+
+@router.get(
+    "/all",
+    response_model=list[ProblemResponse],
+)
+def get_all_government_problems(
+    current_user: User = Depends(require_government),
+    db: Session = Depends(get_db),
+):
+    problems = (
+        db.query(Problem)
+        .order_by(Problem.created_at.desc())
+        .all()
+    )
+
+    return problems
+
+
+# =========================================================
 # GET PENDING PROBLEMS
-# ============================================================
+# SUBMITTED + UNDER_REVIEW
+# =========================================================
 
 @router.get(
     "/pending",
@@ -57,9 +79,9 @@ def get_pending_problems(
     return problems
 
 
-# ============================================================
+# =========================================================
 # GET SINGLE PROBLEM
-# ============================================================
+# =========================================================
 
 @router.get(
     "/{problem_id}",
@@ -85,10 +107,10 @@ def get_government_problem(
     return problem
 
 
-# ============================================================
+# =========================================================
 # REVIEW PROBLEM
-# SUBMITTED → UNDER_REVIEW
-# ============================================================
+# SUBMITTED -> UNDER_REVIEW
+# =========================================================
 
 @router.post(
     "/{problem_id}/review",
@@ -135,16 +157,17 @@ def review_problem(
     )
 
     db.add(history)
+
     db.commit()
     db.refresh(problem)
 
     return problem
 
 
-# ============================================================
+# =========================================================
 # VALIDATE PROBLEM
-# UNDER_REVIEW → VALIDATED
-# ============================================================
+# UNDER_REVIEW -> VALIDATED
+# =========================================================
 
 @router.post(
     "/{problem_id}/validate",
@@ -191,16 +214,17 @@ def validate_problem(
     )
 
     db.add(history)
+
     db.commit()
     db.refresh(problem)
 
     return problem
 
 
-# ============================================================
+# =========================================================
 # REJECT PROBLEM
-# UNDER_REVIEW → REJECTED
-# ============================================================
+# UNDER_REVIEW -> REJECTED
+# =========================================================
 
 @router.post(
     "/{problem_id}/reject",
@@ -247,6 +271,7 @@ def reject_problem(
     )
 
     db.add(history)
+
     db.commit()
     db.refresh(problem)
 

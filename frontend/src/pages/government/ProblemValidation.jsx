@@ -1,1157 +1,872 @@
-import React, { useMemo, useState } from "react";
 import {
   AlertTriangle,
-  ArrowLeft,
   CheckCircle2,
   Clock3,
-  FileCheck2,
+  Eye,
+  FileText,
   MapPin,
-  MessageSquareText,
-  ShieldAlert,
   XCircle,
 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Navbar from "../../components/common/Navbar";
 import EmptyState from "../../components/common/EmptyState";
+import api from "../../services/api";
 
-const initialProblems = [
-  {
-    id: "SAM-001",
-    title: "Frequent electricity interruptions in residential area",
-    description:
-      "Residents have reported frequent power interruptions in the area, especially during evening hours. The issue is affecting households, students, and small businesses.",
-    category: "Electricity",
-    priority: "High",
-    status: "Under Review",
-    location: "Deopur, Dhule",
-    submittedDate: "28 Aug 2026",
-    submittedBy: "Citizen",
-    aiSummary:
-      "Residents in Deopur are experiencing repeated electricity interruptions during evening hours. The issue may be affecting households, students, and local businesses and requires attention from the electricity authority.",
-    department: "Maharashtra State Electricity Distribution Company Limited",
-    authority: "Local Electricity Division, Dhule",
-  },
-  {
-    id: "SAM-004",
-    title: "Irregular water supply in residential locality",
-    description:
-      "Residents are receiving water supply at irregular intervals. The inconsistent schedule is creating difficulties for households and increasing dependence on private water sources.",
-    category: "Water & Sanitation",
-    priority: "Medium-High",
-    status: "Under Review",
-    location: "Chalisgaon Road Area, Dhule",
-    submittedDate: "30 Aug 2026",
-    submittedBy: "Citizen",
-    aiSummary:
-      "The reported locality is facing irregular municipal water supply. The issue may be affecting multiple households and requires verification of the current supply schedule and local water infrastructure.",
-    department: "Dhule Municipal Corporation",
-    authority: "Water Supply Department, Dhule",
-  },
-  {
-    id: "SAM-005",
-    title: "Damaged road surface near public access area",
-    description:
-      "A section of road has developed multiple damaged patches, creating difficulty for two-wheelers, pedestrians, and other vehicles using the route.",
-    category: "PWD & Roads",
-    priority: "Minimum",
-    status: "Under Review",
-    location: "MIDC Area, Dhule",
-    submittedDate: "31 Aug 2026",
-    submittedBy: "Citizen",
-    aiSummary:
-      "A damaged road section has been reported near the MIDC area. The issue may affect local transportation and pedestrian movement and should be inspected by the responsible road authority.",
-    department: "Public Works Department",
-    authority: "PWD Dhule Division",
-  },
-];
 
-function getPriorityStyle(priority) {
-  switch (priority) {
-    case "High":
-      return {
-        background: "#FDECEC",
-        color: "#B42318",
-        border: "#F3B7B2",
-      };
+function formatStatus(status) {
+  switch (status) {
+    case "SUBMITTED":
+      return "Submitted";
 
-    case "Medium-High":
-      return {
-        background: "#FFF4E5",
-        color: "#A15C00",
-        border: "#E8C48A",
-      };
+    case "UNDER_REVIEW":
+      return "Under Review";
 
-    case "Minimum":
+    case "VALIDATED":
+      return "Validated";
+
+    case "REJECTED":
+      return "Rejected";
+
     default:
-      return {
-        background: "#F5F5F5",
-        color: "#666666",
-        border: "#D5D5D5",
-      };
+      return status || "Unknown";
   }
 }
 
-function getCategoryStyle(category) {
-  if (category === "Electricity") {
-    return {
-      background: "#FFF1F1",
-      color: "#A33A3A",
-    };
-  }
 
-  if (category === "Water & Sanitation") {
-    return {
-      background: "#F7E9EC",
-      color: "#7B4A57",
-    };
-  }
+function formatPriority(priority) {
+  switch (priority) {
+    case "MEDIUM_HIGH":
+      return "Medium-High";
 
-  return {
-    background: "#F2F2F2",
-    color: "#5E5E5E",
-  };
+    case "HIGH":
+      return "High";
+
+    case "MEDIUM":
+      return "Medium";
+
+    case "LOW":
+      return "Low";
+
+    case "MINIMUM":
+      return "Minimum";
+
+    default:
+      return priority || "Not Assigned";
+  }
 }
 
-function ProblemValidation() {
-  const navigate = useNavigate();
 
-  const [problems, setProblems] = useState(initialProblems);
-  const [selectedProblem, setSelectedProblem] = useState(null);
-  const [processingId, setProcessingId] = useState(null);
-  const [message, setMessage] = useState(null);
+function formatDate(date) {
+  if (!date) {
+    return "Not available";
+  }
 
-  const awaitingProblems = useMemo(
-    () => problems.filter((problem) => problem.status === "Under Review"),
-    [problems]
-  );
+  try {
+    return new Date(date).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  } catch {
+    return "Not available";
+  }
+}
 
-  const validatedCount = problems.filter(
-    (problem) => problem.status === "Validated"
-  ).length;
 
-  const rejectedCount = problems.filter(
-    (problem) => problem.status === "Rejected"
-  ).length;
+function getStatusClasses(status) {
+  switch (status) {
+    case "VALIDATED":
+      return "border-emerald-200 bg-emerald-50 text-emerald-700";
 
-  const handleValidate = (problem) => {
-    setProcessingId(problem.id);
+    case "REJECTED":
+      return "border-red-200 bg-red-50 text-red-700";
 
-    setTimeout(() => {
-      setProblems((currentProblems) =>
-        currentProblems.map((item) =>
-          item.id === problem.id
-            ? {
-                ...item,
-                status: "Validated",
-              }
-            : item
-        )
-      );
+    case "UNDER_REVIEW":
+      return "border-amber-200 bg-amber-50 text-amber-700";
 
-      setSelectedProblem(null);
-      setProcessingId(null);
+    case "SUBMITTED":
+    default:
+      return "border-blue-200 bg-blue-50 text-blue-700";
+  }
+}
 
-      setMessage({
-        type: "success",
-        text: `${problem.id} has been validated successfully.`,
-      });
-    }, 500);
-  };
 
-  const handleReject = (problem) => {
-    setProcessingId(problem.id);
-
-    setTimeout(() => {
-      setProblems((currentProblems) =>
-        currentProblems.map((item) =>
-          item.id === problem.id
-            ? {
-                ...item,
-                status: "Rejected",
-              }
-            : item
-        )
-      );
-
-      setSelectedProblem(null);
-      setProcessingId(null);
-
-      setMessage({
-        type: "error",
-        text: `${problem.id} has been rejected.`,
-      });
-    }, 500);
-  };
+function ProblemCard({
+  problem,
+  onValidate,
+  onReject,
+  onView,
+}) {
+  const canTakeAction =
+    problem.status === "SUBMITTED" ||
+    problem.status === "UNDER_REVIEW";
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        backgroundColor: "#FFF5F5",
-        color: "#4A4A4A",
-      }}
-    >
-      <Navbar />
+    <div className="rounded-2xl border border-[#E8D9D5] bg-white p-5 shadow-sm transition hover:shadow-md">
+      {/* Header */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <span className="rounded-lg bg-[#F8F1EF] px-2.5 py-1 text-xs font-semibold text-[#7B4B3A]">
+              Problem #{problem.id}
+            </span>
 
-      <main
-        style={{
-          maxWidth: "1400px",
-          margin: "0 auto",
-          padding: "32px 24px 64px",
-        }}
-      >
-        {/* Back */}
+            <span
+              className={`rounded-lg border px-2.5 py-1 text-xs font-semibold ${getStatusClasses(
+                problem.status
+              )}`}
+            >
+              {formatStatus(problem.status)}
+            </span>
+          </div>
+
+          <h3 className="text-lg font-bold text-[#2D211E]">
+            {problem.title}
+          </h3>
+
+          <p className="mt-2 line-clamp-3 text-sm leading-6 text-[#6F625E]">
+            {problem.description}
+          </p>
+        </div>
+      </div>
+
+      {/* Details */}
+      <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="rounded-xl bg-[#FAF7F6] p-3">
+          <div className="flex items-center gap-2 text-xs font-medium text-[#8A7B75]">
+            <FileText size={15} />
+            Category
+          </div>
+
+          <p className="mt-1 text-sm font-semibold text-[#3B2C27]">
+            {problem.category || "Not specified"}
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-[#FAF7F6] p-3">
+          <div className="flex items-center gap-2 text-xs font-medium text-[#8A7B75]">
+            <MapPin size={15} />
+            Location
+          </div>
+
+          <p className="mt-1 text-sm font-semibold text-[#3B2C27]">
+            {problem.location || "Not specified"}
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-[#FAF7F6] p-3">
+          <div className="flex items-center gap-2 text-xs font-medium text-[#8A7B75]">
+            <AlertTriangle size={15} />
+            Priority
+          </div>
+
+          <p className="mt-1 text-sm font-semibold text-[#3B2C27]">
+            {formatPriority(problem.priority)}
+          </p>
+        </div>
+
+        <div className="rounded-xl bg-[#FAF7F6] p-3">
+          <div className="flex items-center gap-2 text-xs font-medium text-[#8A7B75]">
+            <Clock3 size={15} />
+            Submitted
+          </div>
+
+          <p className="mt-1 text-sm font-semibold text-[#3B2C27]">
+            {formatDate(problem.created_at)}
+          </p>
+        </div>
+      </div>
+
+      {/* AI Summary */}
+      {problem.ai_summary && (
+        <div className="mt-4 rounded-xl border border-purple-100 bg-purple-50 p-4">
+          <p className="text-xs font-bold uppercase tracking-wide text-purple-700">
+            AI Summary
+          </p>
+
+          <p className="mt-1 text-sm leading-6 text-purple-900">
+            {problem.ai_summary}
+          </p>
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-[#F0E7E4] pt-4">
         <button
-          onClick={() => navigate("/government")}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            border: "none",
-            background: "transparent",
-            color: "#4A4A4A",
-            fontWeight: 700,
-            padding: 0,
-            marginBottom: "24px",
-          }}
+          type="button"
+          onClick={() => onView(problem)}
+          className="inline-flex items-center gap-2 rounded-xl border border-[#DCCBC5] bg-white px-4 py-2.5 text-sm font-semibold text-[#5D4037] transition hover:bg-[#FAF5F3]"
         >
-          <ArrowLeft size={18} />
-          Back to Government Dashboard
+          <Eye size={17} />
+          View Details
         </button>
 
-        {/* Header */}
-        <section
-          style={{
-            background:
-              "linear-gradient(135deg, #F7D6D0 0%, #FFF5F5 70%)",
-            border: "1px solid #E2B4BD",
-            borderRadius: "24px",
-            padding: "32px",
-            marginBottom: "28px",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: "24px",
-              alignItems: "flex-start",
-              flexWrap: "wrap",
-            }}
-          >
-            <div style={{ maxWidth: "760px" }}>
-              <div
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "7px 12px",
-                  borderRadius: "999px",
-                  backgroundColor: "#FFFFFF",
-                  border: "1px solid #E2B4BD",
-                  fontSize: "12px",
-                  fontWeight: 800,
-                  marginBottom: "14px",
-                }}
-              >
-                <ShieldAlert size={15} />
-                GOVERNMENT VALIDATION WORKSPACE
-              </div>
-
-              <h1
-                style={{
-                  margin: "0 0 10px",
-                  fontSize: "clamp(28px, 4vw, 42px)",
-                  lineHeight: 1.1,
-                  color: "#4A4A4A",
-                }}
-              >
-                Problem Validation
-              </h1>
-
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: "15px",
-                  lineHeight: 1.7,
-                  color: "#666666",
-                }}
-              >
-                Review citizen-reported problems, verify the information,
-                inspect AI-generated insights, and validate genuine issues
-                before they are routed to the responsible authority.
-              </p>
-            </div>
-
-            <div
-              style={{
-                minWidth: "190px",
-                padding: "18px",
-                borderRadius: "18px",
-                backgroundColor: "#FFFFFF",
-                border: "1px solid #E2B4BD",
-              }}
+        {canTakeAction && (
+          <>
+            <button
+              type="button"
+              onClick={() => onValidate(problem)}
+              className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
             >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  color: "#7B4A57",
-                  fontWeight: 800,
-                  fontSize: "13px",
-                  marginBottom: "8px",
-                }}
-              >
-                <Clock3 size={17} />
-                Awaiting Review
-              </div>
-
-              <div
-                style={{
-                  fontSize: "34px",
-                  fontWeight: 900,
-                  color: "#4A4A4A",
-                }}
-              >
-                {awaitingProblems.length}
-              </div>
-
-              <div
-                style={{
-                  fontSize: "12px",
-                  color: "#777777",
-                  marginTop: "3px",
-                }}
-              >
-                Problems require validation
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Feedback */}
-        {message && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "16px",
-              padding: "14px 16px",
-              marginBottom: "22px",
-              borderRadius: "14px",
-              backgroundColor:
-                message.type === "success" ? "#EDF8F1" : "#FDECEC",
-              border: `1px solid ${
-                message.type === "success" ? "#B7DEC2" : "#F1B8B4"
-              }`,
-              color:
-                message.type === "success" ? "#24663B" : "#9B2C27",
-              fontWeight: 700,
-              fontSize: "14px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "9px",
-              }}
-            >
-              {message.type === "success" ? (
-                <CheckCircle2 size={19} />
-              ) : (
-                <XCircle size={19} />
-              )}
-
-              {message.text}
-            </div>
+              <CheckCircle2 size={17} />
+              Validate
+            </button>
 
             <button
-              onClick={() => setMessage(null)}
-              style={{
-                border: "none",
-                background: "transparent",
-                color: "inherit",
-                fontWeight: 800,
-              }}
-            >
-              ×
-            </button>
-          </div>
-        )}
-
-        {/* Stats */}
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
-            gap: "16px",
-            marginBottom: "30px",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "#FFFFFF",
-              border: "1px solid #E2B4BD",
-              borderRadius: "18px",
-              padding: "20px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "9px",
-                color: "#7B4A57",
-                fontSize: "13px",
-                fontWeight: 800,
-              }}
-            >
-              <Clock3 size={17} />
-              Awaiting Validation
-            </div>
-
-            <div
-              style={{
-                fontSize: "30px",
-                fontWeight: 900,
-                marginTop: "12px",
-              }}
-            >
-              {awaitingProblems.length}
-            </div>
-          </div>
-
-          <div
-            style={{
-              backgroundColor: "#FFFFFF",
-              border: "1px solid #E2B4BD",
-              borderRadius: "18px",
-              padding: "20px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "9px",
-                color: "#24663B",
-                fontSize: "13px",
-                fontWeight: 800,
-              }}
-            >
-              <FileCheck2 size={17} />
-              Validated
-            </div>
-
-            <div
-              style={{
-                fontSize: "30px",
-                fontWeight: 900,
-                marginTop: "12px",
-              }}
-            >
-              {validatedCount}
-            </div>
-          </div>
-
-          <div
-            style={{
-              backgroundColor: "#FFFFFF",
-              border: "1px solid #E2B4BD",
-              borderRadius: "18px",
-              padding: "20px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "9px",
-                color: "#9B2C27",
-                fontSize: "13px",
-                fontWeight: 800,
-              }}
+              type="button"
+              onClick={() => onReject(problem)}
+              className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
             >
               <XCircle size={17} />
-              Rejected
-            </div>
+              Reject
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
 
-            <div
-              style={{
-                fontSize: "30px",
-                fontWeight: 900,
-                marginTop: "12px",
-              }}
-            >
-              {rejectedCount}
-            </div>
-          </div>
-        </section>
 
-        {/* Main content */}
-        <section>
-          <div style={{ marginBottom: "18px" }}>
-            <h2
-              style={{
-                margin: 0,
-                fontSize: "24px",
-                color: "#4A4A4A",
-              }}
-            >
-              Problems Awaiting Validation
+function ProblemDetailsModal({
+  problem,
+  onClose,
+  onValidate,
+  onReject,
+}) {
+  if (!problem) {
+    return null;
+  }
+
+  const canTakeAction =
+    problem.status === "SUBMITTED" ||
+    problem.status === "UNDER_REVIEW";
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
+      <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-white shadow-2xl">
+        {/* Modal Header */}
+        <div className="sticky top-0 z-10 flex items-start justify-between border-b border-[#E8D9D5] bg-white px-6 py-5">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-[#9A6B58]">
+              Problem #{problem.id}
+            </p>
+
+            <h2 className="mt-1 text-xl font-bold text-[#2D211E]">
+              {problem.title}
             </h2>
+          </div>
 
-            <p
-              style={{
-                margin: "6px 0 0",
-                color: "#777777",
-                fontSize: "14px",
-              }}
-            >
-              Review each report before it enters the government routing
-              workflow.
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl p-2 text-[#776963] transition hover:bg-[#F7F1EF] hover:text-[#3B2C27]"
+          >
+            <XCircle size={22} />
+          </button>
+        </div>
+
+        {/* Modal Body */}
+        <div className="space-y-5 p-6">
+          <div>
+            <p className="text-sm font-semibold text-[#4D3A33]">
+              Description
+            </p>
+
+            <p className="mt-2 text-sm leading-7 text-[#6F625E]">
+              {problem.description}
             </p>
           </div>
 
-          {awaitingProblems.length === 0 ? (
-            <EmptyState
-              title="No problems awaiting validation"
-              description="All currently submitted problems have been processed."
-            />
-          ) : (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-                gap: "18px",
-              }}
-            >
-              {awaitingProblems.map((problem) => {
-                const priority = getPriorityStyle(problem.priority);
-                const category = getCategoryStyle(problem.category);
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="rounded-xl bg-[#FAF7F6] p-4">
+              <p className="text-xs font-medium text-[#8A7B75]">
+                Category
+              </p>
 
-                return (
-                  <article
-                    key={problem.id}
-                    style={{
-                      backgroundColor: "#FFFFFF",
-                      border: "1px solid #E2B4BD",
-                      borderRadius: "20px",
-                      padding: "22px",
-                      boxShadow: "0 6px 20px rgba(74, 74, 74, 0.05)",
-                    }}
-                  >
-                    {/* Top row */}
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
-                        gap: "12px",
-                        marginBottom: "16px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "8px",
-                          flexWrap: "wrap",
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontSize: "11px",
-                            padding: "4px 8px",
-                            borderRadius: "999px",
-                            backgroundColor: "#F7D6D0",
-                            color: "#4A4A4A",
-                            fontWeight: 900,
-                          }}
-                        >
-                          {problem.id}
-                        </span>
+              <p className="mt-1 font-semibold text-[#3B2C27]">
+                {problem.category || "Not specified"}
+              </p>
+            </div>
 
-                        <span
-                          style={{
-                            fontSize: "11px",
-                            padding: "4px 8px",
-                            borderRadius: "999px",
-                            backgroundColor: category.background,
-                            color: category.color,
-                            fontWeight: 800,
-                          }}
-                        >
-                          {problem.category}
-                        </span>
-                      </div>
+            <div className="rounded-xl bg-[#FAF7F6] p-4">
+              <p className="text-xs font-medium text-[#8A7B75]">
+                Status
+              </p>
 
-                      <span
-                        style={{
-                          fontSize: "11px",
-                          padding: "4px 8px",
-                          borderRadius: "999px",
-                          backgroundColor: priority.background,
-                          color: priority.color,
-                          border: `1px solid ${priority.border}`,
-                          fontWeight: 800,
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {problem.priority}
-                      </span>
-                    </div>
+              <p className="mt-1 font-semibold text-[#3B2C27]">
+                {formatStatus(problem.status)}
+              </p>
+            </div>
 
-                    {/* Title */}
-                    <h3
-                      style={{
-                        margin: "0 0 9px",
-                        fontSize: "18px",
-                        lineHeight: 1.35,
-                        color: "#4A4A4A",
-                      }}
-                    >
-                      {problem.title}
-                    </h3>
+            <div className="rounded-xl bg-[#FAF7F6] p-4">
+              <p className="text-xs font-medium text-[#8A7B75]">
+                Location
+              </p>
 
-                    {/* Description */}
-                    <p
-                      style={{
-                        margin: "0 0 16px",
-                        fontSize: "13px",
-                        lineHeight: 1.65,
-                        color: "#6F6F6F",
-                      }}
-                    >
-                      {problem.description}
-                    </p>
+              <p className="mt-1 font-semibold text-[#3B2C27]">
+                {problem.location || "Not specified"}
+              </p>
+            </div>
 
-                    {/* Location */}
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        fontSize: "12px",
-                        color: "#666666",
-                        marginBottom: "18px",
-                      }}
-                    >
-                      <MapPin size={15} />
-                      {problem.location}
-                    </div>
+            <div className="rounded-xl bg-[#FAF7F6] p-4">
+              <p className="text-xs font-medium text-[#8A7B75]">
+                District
+              </p>
 
-                    {/* AI summary preview */}
-                    <div
-                      style={{
-                        backgroundColor: "#FFF8F8",
-                        border: "1px solid #F0D4D8",
-                        borderRadius: "14px",
-                        padding: "14px",
-                        marginBottom: "18px",
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "7px",
-                          fontSize: "12px",
-                          fontWeight: 900,
-                          color: "#7B4A57",
-                          marginBottom: "7px",
-                        }}
-                      >
-                        <MessageSquareText size={15} />
-                        AI-GENERATED SUMMARY
-                      </div>
+              <p className="mt-1 font-semibold text-[#3B2C27]">
+                {problem.district || "Not specified"}
+              </p>
+            </div>
 
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: "12px",
-                          lineHeight: 1.6,
-                          color: "#666666",
-                        }}
-                      >
-                        {problem.aiSummary}
-                      </p>
-                    </div>
+            <div className="rounded-xl bg-[#FAF7F6] p-4">
+              <p className="text-xs font-medium text-[#8A7B75]">
+                Priority
+              </p>
 
-                    {/* Action */}
-                    <button
-                      onClick={() => setSelectedProblem(problem)}
-                      style={{
-                        width: "100%",
-                        display: "inline-flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        gap: "8px",
-                        padding: "11px 15px",
-                        borderRadius: "12px",
-                        border: "1px solid #4A4A4A",
-                        backgroundColor: "#4A4A4A",
-                        color: "#FFFFFF",
-                        fontWeight: 800,
-                        fontSize: "13px",
-                      }}
-                    >
-                      <FileCheck2 size={16} color="#FFFFFF" />
-                      <span style={{ color: "#FFFFFF" }}>
-                        Review Problem
-                      </span>
-                    </button>
-                  </article>
-                );
-              })}
+              <p className="mt-1 font-semibold text-[#3B2C27]">
+                {formatPriority(problem.priority)}
+              </p>
+            </div>
+
+            <div className="rounded-xl bg-[#FAF7F6] p-4">
+              <p className="text-xs font-medium text-[#8A7B75]">
+                Submitted On
+              </p>
+
+              <p className="mt-1 font-semibold text-[#3B2C27]">
+                {formatDate(problem.created_at)}
+              </p>
+            </div>
+          </div>
+
+          {problem.ai_category && (
+            <div className="rounded-xl border border-purple-100 bg-purple-50 p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-purple-700">
+                AI Category
+              </p>
+
+              <p className="mt-1 text-sm font-semibold text-purple-900">
+                {problem.ai_category}
+              </p>
             </div>
           )}
-        </section>
-      </main>
 
-      {/* Review Modal */}
-      {selectedProblem && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            backgroundColor: "rgba(40, 30, 30, 0.48)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "20px",
-            zIndex: 1000,
-          }}
-          onClick={() => setSelectedProblem(null)}
-        >
-          <div
-            style={{
-              width: "100%",
-              maxWidth: "820px",
-              maxHeight: "90vh",
-              overflowY: "auto",
-              backgroundColor: "#FFFFFF",
-              borderRadius: "24px",
-              border: "1px solid #E2B4BD",
-              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.18)",
-            }}
-            onClick={(event) => event.stopPropagation()}
+          {problem.ai_summary && (
+            <div className="rounded-xl border border-purple-100 bg-purple-50 p-4">
+              <p className="text-xs font-bold uppercase tracking-wide text-purple-700">
+                AI Summary
+              </p>
+
+              <p className="mt-1 text-sm leading-6 text-purple-900">
+                {problem.ai_summary}
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Modal Footer */}
+        <div className="flex flex-wrap justify-end gap-3 border-t border-[#E8D9D5] px-6 py-5">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl border border-[#DCCBC5] px-5 py-2.5 text-sm font-semibold text-[#5D4037] transition hover:bg-[#FAF5F3]"
           >
-            {/* Modal header */}
-            <div
-              style={{
-                padding: "24px 26px",
-                borderBottom: "1px solid #F0DDE0",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                gap: "16px",
-              }}
-            >
-              <div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    marginBottom: "8px",
-                  }}
-                >
-                  <span
-                    style={{
-                      padding: "5px 9px",
-                      borderRadius: "999px",
-                      backgroundColor: "#F7D6D0",
-                      fontSize: "11px",
-                      fontWeight: 900,
-                    }}
-                  >
-                    {selectedProblem.id}
-                  </span>
+            Close
+          </button>
 
-                  <span
-                    style={{
-                      padding: "5px 9px",
-                      borderRadius: "999px",
-                      backgroundColor: getPriorityStyle(
-                        selectedProblem.priority
-                      ).background,
-                      color: getPriorityStyle(
-                        selectedProblem.priority
-                      ).color,
-                      fontSize: "11px",
-                      fontWeight: 900,
-                    }}
-                  >
-                    {selectedProblem.priority} Priority
-                  </span>
-                </div>
-
-                <h2
-                  style={{
-                    margin: 0,
-                    fontSize: "24px",
-                    lineHeight: 1.3,
-                    color: "#4A4A4A",
-                  }}
-                >
-                  {selectedProblem.title}
-                </h2>
-              </div>
+          {canTakeAction && (
+            <>
+              <button
+                type="button"
+                onClick={() => onReject(problem)}
+                className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
+              >
+                <XCircle size={17} />
+                Reject
+              </button>
 
               <button
-                onClick={() => setSelectedProblem(null)}
-                style={{
-                  width: "36px",
-                  height: "36px",
-                  borderRadius: "50%",
-                  border: "1px solid #E2B4BD",
-                  backgroundColor: "#FFF5F5",
-                  color: "#4A4A4A",
-                  fontSize: "22px",
-                  lineHeight: 1,
-                }}
-                aria-label="Close review"
+                type="button"
+                onClick={() => onValidate(problem)}
+                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
               >
-                ×
+                <CheckCircle2 size={17} />
+                Validate
               </button>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+export default function ProblemValidation() {
+  const navigate = useNavigate();
+
+  const [problems, setProblems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("awaiting");
+  const [selectedProblem, setSelectedProblem] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [message, setMessage] = useState(null);
+
+  // =========================================================
+  // LOAD ALL GOVERNMENT PROBLEMS
+  // =========================================================
+
+  async function loadProblems() {
+    try {
+      setLoading(true);
+
+      const response = await api.get(
+        "/api/government/problems/all"
+      );
+
+      const backendProblems = Array.isArray(response.data)
+        ? response.data
+        : [];
+
+      setProblems(backendProblems);
+    } catch (error) {
+      console.error(
+        "Failed to load government problems:",
+        error
+      );
+
+      setMessage({
+        type: "error",
+        text:
+          error.message ||
+          "Unable to load government problems.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadProblems();
+  }, []);
+
+  // Refresh whenever user comes back to the page
+  useEffect(() => {
+    const handleFocus = () => {
+      loadProblems();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        loadProblems();
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibilityChange
+    );
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange
+      );
+    };
+  }, []);
+
+  // =========================================================
+  // COUNTS
+  // =========================================================
+
+  const awaitingProblems = useMemo(
+    () =>
+      problems.filter(
+        (problem) =>
+          problem.status === "SUBMITTED" ||
+          problem.status === "UNDER_REVIEW"
+      ),
+    [problems]
+  );
+
+  const validatedProblems = useMemo(
+    () =>
+      problems.filter(
+        (problem) => problem.status === "VALIDATED"
+      ),
+    [problems]
+  );
+
+  const rejectedProblems = useMemo(
+    () =>
+      problems.filter(
+        (problem) => problem.status === "REJECTED"
+      ),
+    [problems]
+  );
+
+  const activeProblems = useMemo(() => {
+    switch (activeTab) {
+      case "validated":
+        return validatedProblems;
+
+      case "rejected":
+        return rejectedProblems;
+
+      case "awaiting":
+      default:
+        return awaitingProblems;
+    }
+  }, [
+    activeTab,
+    awaitingProblems,
+    validatedProblems,
+    rejectedProblems,
+  ]);
+
+  // =========================================================
+  // VALIDATE
+  // SUBMITTED -> UNDER_REVIEW -> VALIDATED
+  // =========================================================
+
+  async function handleValidate(problem) {
+    if (!problem) {
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      setMessage(null);
+
+      // If problem is still SUBMITTED,
+      // first move it to UNDER_REVIEW.
+      if (problem.status === "SUBMITTED") {
+        await api.post(
+          `/api/government/problems/${problem.id}/review`,
+          {
+            comment:
+              "Problem opened for government validation.",
+          }
+        );
+      }
+
+      // Then validate it.
+      await api.post(
+        `/api/government/problems/${problem.id}/validate`,
+        {
+          comment:
+            "Problem validated by government authority.",
+        }
+      );
+
+      setSelectedProblem(null);
+
+      setMessage({
+        type: "success",
+        text: `Problem #${problem.id} has been validated successfully.`,
+      });
+
+      // Reload from database so the problem
+      // immediately appears in Validated tab.
+      await loadProblems();
+
+      setActiveTab("validated");
+    } catch (error) {
+      console.error(
+        "Problem validation failed:",
+        error
+      );
+
+      setMessage({
+        type: "error",
+        text:
+          error.message ||
+          "Unable to validate the problem.",
+      });
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
+  // =========================================================
+  // REJECT
+  // SUBMITTED -> UNDER_REVIEW -> REJECTED
+  // =========================================================
+
+  async function handleReject(problem) {
+    if (!problem) {
+      return;
+    }
+
+    try {
+      setActionLoading(true);
+      setMessage(null);
+
+      // If problem is still SUBMITTED,
+      // first move it to UNDER_REVIEW.
+      if (problem.status === "SUBMITTED") {
+        await api.post(
+          `/api/government/problems/${problem.id}/review`,
+          {
+            comment:
+              "Problem opened for government review.",
+          }
+        );
+      }
+
+      // Then reject it.
+      await api.post(
+        `/api/government/problems/${problem.id}/reject`,
+        {
+          comment:
+            "Problem rejected by government authority.",
+        }
+      );
+
+      setSelectedProblem(null);
+
+      setMessage({
+        type: "success",
+        text: `Problem #${problem.id} has been rejected.`,
+      });
+
+      // Reload from database.
+      await loadProblems();
+
+      setActiveTab("rejected");
+    } catch (error) {
+      console.error(
+        "Problem rejection failed:",
+        error
+      );
+
+      setMessage({
+        type: "error",
+        text:
+          error.message ||
+          "Unable to reject the problem.",
+      });
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
+  // =========================================================
+  // TAB CONFIG
+  // =========================================================
+
+  const tabs = [
+    {
+      id: "awaiting",
+      label: "Awaiting Validation",
+      count: awaitingProblems.length,
+      icon: Clock3,
+    },
+    {
+      id: "validated",
+      label: "Validated",
+      count: validatedProblems.length,
+      icon: CheckCircle2,
+    },
+    {
+      id: "rejected",
+      label: "Rejected",
+      count: rejectedProblems.length,
+      icon: XCircle,
+    },
+  ];
+
+  // =========================================================
+  // RENDER
+  // =========================================================
+
+  return (
+    <div className="min-h-screen bg-[#FBF8F7]">
+      <Navbar />
+
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <button
+            type="button"
+            onClick={() => navigate("/government")}
+            className="mb-4 text-sm font-semibold text-[#8B5E4A] hover:text-[#5D4037]"
+          >
+            ← Back to Government Dashboard
+          </button>
+
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-wider text-[#9A6B58]">
+                Government Workspace
+              </p>
+
+              <h1 className="mt-1 text-3xl font-bold tracking-tight text-[#2D211E]">
+                Problem Validation
+              </h1>
+
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-[#6F625E]">
+                Review citizen-submitted problems, validate
+                genuine issues, and manage rejected cases.
+              </p>
             </div>
 
-            {/* Modal body */}
-            <div style={{ padding: "26px" }}>
-              {/* Details */}
-              <section style={{ marginBottom: "24px" }}>
-                <h3
-                  style={{
-                    margin: "0 0 10px",
-                    fontSize: "16px",
-                  }}
-                >
-                  Problem Details
-                </h3>
+            <button
+              type="button"
+              onClick={loadProblems}
+              disabled={loading}
+              className="rounded-xl border border-[#DCCBC5] bg-white px-4 py-2.5 text-sm font-semibold text-[#5D4037] transition hover:bg-[#FAF5F3] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? "Refreshing..." : "Refresh"}
+            </button>
+          </div>
+        </div>
 
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: "14px",
-                    lineHeight: 1.75,
-                    color: "#666666",
-                  }}
-                >
-                  {selectedProblem.description}
-                </p>
+        {/* Message */}
+        {message && (
+          <div
+            className={`mb-6 rounded-2xl border px-4 py-3 text-sm font-medium ${
+              message.type === "success"
+                ? "border-emerald-200 bg-emerald-50 text-emerald-800"
+                : "border-red-200 bg-red-50 text-red-800"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
 
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      "repeat(auto-fit, minmax(180px, 1fr))",
-                    gap: "12px",
-                    marginTop: "18px",
-                  }}
-                >
-                  <div
-                    style={{
-                      padding: "13px",
-                      borderRadius: "12px",
-                      backgroundColor: "#FFF5F5",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "11px",
-                        color: "#888888",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      CATEGORY
-                    </div>
-                    <strong style={{ fontSize: "13px" }}>
-                      {selectedProblem.category}
-                    </strong>
-                  </div>
+        {/* Tabs */}
+        <div className="mb-6 overflow-x-auto">
+          <div className="flex min-w-max gap-2 rounded-2xl border border-[#E8D9D5] bg-white p-2 shadow-sm">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
 
-                  <div
-                    style={{
-                      padding: "13px",
-                      borderRadius: "12px",
-                      backgroundColor: "#FFF5F5",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "11px",
-                        color: "#888888",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      LOCATION
-                    </div>
-                    <strong style={{ fontSize: "13px" }}>
-                      {selectedProblem.location}
-                    </strong>
-                  </div>
-
-                  <div
-                    style={{
-                      padding: "13px",
-                      borderRadius: "12px",
-                      backgroundColor: "#FFF5F5",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "11px",
-                        color: "#888888",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      SUBMITTED
-                    </div>
-                    <strong style={{ fontSize: "13px" }}>
-                      {selectedProblem.submittedDate}
-                    </strong>
-                  </div>
-                </div>
-              </section>
-
-              {/* AI Analysis */}
-              <section
-                style={{
-                  padding: "20px",
-                  backgroundColor: "#FFF8F8",
-                  border: "1px solid #E2B4BD",
-                  borderRadius: "18px",
-                  marginBottom: "24px",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    marginBottom: "14px",
-                    color: "#7B4A57",
-                    fontWeight: 900,
-                    fontSize: "14px",
-                  }}
-                >
-                  <MessageSquareText size={18} />
-                  AI ANALYSIS
-                </div>
-
-                <div style={{ marginBottom: "18px" }}>
-                  <div
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: 900,
-                      color: "#888888",
-                      marginBottom: "6px",
-                    }}
-                  >
-                    GENERATED SUMMARY
-                  </div>
-
-                  <p
-                    style={{
-                      margin: 0,
-                      fontSize: "13px",
-                      lineHeight: 1.7,
-                      color: "#5F5F5F",
-                    }}
-                  >
-                    {selectedProblem.aiSummary}
-                  </p>
-                </div>
-
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      "repeat(auto-fit, minmax(200px, 1fr))",
-                    gap: "12px",
-                  }}
-                >
-                  <div
-                    style={{
-                      padding: "14px",
-                      backgroundColor: "#FFFFFF",
-                      borderRadius: "12px",
-                      border: "1px solid #F0D4D8",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "11px",
-                        color: "#888888",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      CLASSIFICATION
-                    </div>
-
-                    <strong style={{ fontSize: "14px" }}>
-                      {selectedProblem.category}
-                    </strong>
-                  </div>
-
-                  <div
-                    style={{
-                      padding: "14px",
-                      backgroundColor: "#FFFFFF",
-                      borderRadius: "12px",
-                      border: "1px solid #F0D4D8",
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "11px",
-                        color: "#888888",
-                        marginBottom: "5px",
-                      }}
-                    >
-                      AI PRIORITY
-                    </div>
-
-                    <strong style={{ fontSize: "14px" }}>
-                      {selectedProblem.priority}
-                    </strong>
-                  </div>
-                </div>
-              </section>
-
-              {/* Suggested authority */}
-              <section
-                style={{
-                  padding: "18px",
-                  borderRadius: "16px",
-                  border: "1px solid #E2B4BD",
-                  marginBottom: "26px",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    marginBottom: "12px",
-                    fontWeight: 900,
-                    fontSize: "14px",
-                  }}
-                >
-                  <AlertTriangle size={18} />
-                  Suggested Responsible Authority
-                </div>
-
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns:
-                      "repeat(auto-fit, minmax(220px, 1fr))",
-                    gap: "12px",
-                  }}
-                >
-                  <div>
-                    <div
-                      style={{
-                        fontSize: "11px",
-                        color: "#888888",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      DEPARTMENT
-                    </div>
-
-                    <strong style={{ fontSize: "13px" }}>
-                      {selectedProblem.department}
-                    </strong>
-                  </div>
-
-                  <div>
-                    <div
-                      style={{
-                        fontSize: "11px",
-                        color: "#888888",
-                        marginBottom: "4px",
-                      }}
-                    >
-                      AUTHORITY
-                    </div>
-
-                    <strong style={{ fontSize: "13px" }}>
-                      {selectedProblem.authority}
-                    </strong>
-                  </div>
-                </div>
-              </section>
-
-              {/* Actions */}
-              <div
-                style={{
-                  display: "flex",
-                  gap: "12px",
-                  flexWrap: "wrap",
-                }}
-              >
+              return (
                 <button
-                  onClick={() => handleReject(selectedProblem)}
-                  disabled={processingId === selectedProblem.id}
-                  style={{
-                    flex: "1 1 180px",
-                    display: "inline-flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: "8px",
-                    padding: "13px 18px",
-                    borderRadius: "12px",
-                    border: "1px solid #C94B45",
-                    backgroundColor: "#FFFFFF",
-                    color: "#B42318",
-                    fontWeight: 900,
-                    opacity:
-                      processingId === selectedProblem.id ? 0.6 : 1,
-                  }}
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                    isActive
+                      ? "bg-[#5D4037] text-white shadow-sm"
+                      : "text-[#6F625E] hover:bg-[#F8F1EF] hover:text-[#3B2C27]"
+                  }`}
                 >
-                  <XCircle size={17} color="#B42318" />
-                  <span style={{ color: "#B42318" }}>
-                    {processingId === selectedProblem.id
-                      ? "Processing..."
-                      : "Reject Problem"}
+                  <Icon size={17} />
+
+                  <span>{tab.label}</span>
+
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs ${
+                      isActive
+                        ? "bg-white/20 text-white"
+                        : "bg-[#F1E8E5] text-[#6F625E]"
+                    }`}
+                  >
+                    {tab.count}
                   </span>
                 </button>
+              );
+            })}
+          </div>
+        </div>
 
-                <button
-                  onClick={() => handleValidate(selectedProblem)}
-                  disabled={processingId === selectedProblem.id}
-                  style={{
-                    flex: "1 1 220px",
-                    display: "inline-flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: "8px",
-                    padding: "13px 18px",
-                    borderRadius: "12px",
-                    border: "1px solid #4A4A4A",
-                    backgroundColor: "#4A4A4A",
-                    color: "#FFFFFF",
-                    fontWeight: 900,
-                    opacity:
-                      processingId === selectedProblem.id ? 0.6 : 1,
-                  }}
-                >
-                  <CheckCircle2 size={17} color="#FFFFFF" />
+        {/* Current Section */}
+        <div className="mb-4">
+          <h2 className="text-xl font-bold text-[#2D211E]">
+            {activeTab === "awaiting" &&
+              "Problems Awaiting Validation"}
 
-                  <span style={{ color: "#FFFFFF" }}>
-                    {processingId === selectedProblem.id
-                      ? "Validating..."
-                      : "Validate Problem"}
-                  </span>
-                </button>
-              </div>
+            {activeTab === "validated" &&
+              "Validated Problems"}
+
+            {activeTab === "rejected" &&
+              "Rejected Problems"}
+          </h2>
+
+          <p className="mt-1 text-sm text-[#7B6C66]">
+            {activeTab === "awaiting" &&
+              "Problems that still require government review."}
+
+            {activeTab === "validated" &&
+              "Problems that have been successfully validated."}
+
+            {activeTab === "rejected" &&
+              "Problems that were rejected during government review."}
+          </p>
+        </div>
+
+        {/* Loading */}
+        {loading ? (
+          <div className="rounded-2xl border border-[#E8D9D5] bg-white p-12 text-center shadow-sm">
+            <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-[#E8D9D5] border-t-[#5D4037]" />
+
+            <p className="mt-4 text-sm font-medium text-[#6F625E]">
+              Loading problems...
+            </p>
+          </div>
+        ) : activeProblems.length === 0 ? (
+          <EmptyState
+            title={
+              activeTab === "awaiting"
+                ? "No problems awaiting validation"
+                : activeTab === "validated"
+                ? "No validated problems"
+                : "No rejected problems"
+            }
+            description={
+              activeTab === "awaiting"
+                ? "All currently submitted problems have been processed."
+                : activeTab === "validated"
+                ? "Validated problems will appear here."
+                : "Rejected problems will appear here."
+            }
+          />
+        ) : (
+          <div className="space-y-4">
+            {activeProblems.map((problem) => (
+              <ProblemCard
+                key={problem.id}
+                problem={problem}
+                onValidate={handleValidate}
+                onReject={handleReject}
+                onView={setSelectedProblem}
+              />
+            ))}
+          </div>
+        )}
+      </main>
+
+      {/* Details Modal */}
+      <ProblemDetailsModal
+        problem={selectedProblem}
+        onClose={() => {
+          if (!actionLoading) {
+            setSelectedProblem(null);
+          }
+        }}
+        onValidate={handleValidate}
+        onReject={handleReject}
+      />
+
+      {/* Action Loading Overlay */}
+      {actionLoading && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/20">
+          <div className="rounded-2xl bg-white px-6 py-5 shadow-2xl">
+            <div className="flex items-center gap-3">
+              <div className="h-6 w-6 animate-spin rounded-full border-3 border-[#DCCBC5] border-t-[#5D4037]" />
+
+              <p className="text-sm font-semibold text-[#3B2C27]">
+                Updating problem status...
+              </p>
             </div>
           </div>
         </div>
@@ -1159,5 +874,3 @@ function ProblemValidation() {
     </div>
   );
 }
-
-export default ProblemValidation;

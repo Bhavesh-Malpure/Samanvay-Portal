@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Activity,
   AlertTriangle,
@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   TrendingUp,
   Users,
+  XCircle,
 } from "lucide-react";
 
 import Navbar from "../../components/common/Navbar";
@@ -16,6 +17,7 @@ import StatCard from "../../components/dashboard/StatCard";
 import ActivityFeed from "../../components/dashboard/ActivityFeed";
 import PriorityChart from "../../components/dashboard/PriorityChart";
 import ImpactCard from "../../components/dashboard/ImpactCard";
+import api from "../../services/api";
 
 /* =========================================================
    SAMANVAY PORTAL
@@ -87,6 +89,83 @@ const statusStyles = {
 };
 
 function GovernmentDashboard() {
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    validated: 0,
+    rejected: 0,
+  });
+
+  const [loadingStats, setLoadingStats] = useState(true);
+
+  const loadGovernmentStats = useCallback(async () => {
+    try {
+      setLoadingStats(true);
+
+      console.log("Loading government stats...");
+
+      const response = await api.get("/api/government/stats");
+
+      console.log(
+        "Government stats response:",
+        response.data
+      );
+
+      if (response.data) {
+        setStats({
+          total: Number(response.data.total ?? 0),
+          pending: Number(response.data.pending ?? 0),
+          validated: Number(response.data.validated ?? 0),
+          rejected: Number(response.data.rejected ?? 0),
+        });
+      }
+    } catch (error) {
+      console.error(
+        "Failed to load government dashboard stats:",
+        error
+      );
+
+      /*
+       * Important:
+       * Do NOT reset stats to zero when API fails.
+       * Existing values should remain visible.
+       */
+    } finally {
+      setLoadingStats(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Initial load
+    loadGovernmentStats();
+
+    // Refresh when browser/tab becomes active
+    const handleFocus = () => {
+      loadGovernmentStats();
+    };
+
+    // Refresh when page becomes visible again
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        loadGovernmentStats();
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibilityChange
+    );
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange
+      );
+    };
+  }, [loadGovernmentStats]);
+
   return (
     <div
       style={{
@@ -139,6 +218,7 @@ function GovernmentDashboard() {
                 }}
               >
                 <ShieldCheck size={16} />
+
                 <span style={{ color: "#4A4A4A" }}>
                   Government Authority Workspace
                 </span>
@@ -183,10 +263,12 @@ function GovernmentDashboard() {
                 borderRadius: "12px",
                 fontSize: "14px",
                 fontWeight: 700,
-                boxShadow: "0 5px 18px rgba(74, 74, 74, 0.05)",
+                boxShadow:
+                  "0 5px 18px rgba(74, 74, 74, 0.05)",
               }}
             >
               <MapPin size={17} />
+
               <span style={{ color: "#4A4A4A" }}>
                 Dhule District · Maharashtra
               </span>
@@ -200,14 +282,19 @@ function GovernmentDashboard() {
         <section
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+            gridTemplateColumns:
+              "repeat(auto-fit, minmax(210px, 1fr))",
             gap: "16px",
             marginBottom: "24px",
           }}
         >
           <StatCard
             title="Problems Received"
-            value="3"
+            value={
+              loadingStats && stats.total === 0
+                ? "..."
+                : String(stats.total)
+            }
             description="Citizen reports in prototype"
             icon={Activity}
             trend="+2 this week"
@@ -216,11 +303,23 @@ function GovernmentDashboard() {
 
           <StatCard
             title="Pending Review"
-            value="1"
+            value={
+              loadingStats && stats.pending === 0
+                ? "..."
+                : String(stats.pending)
+            }
             description="Requires authority validation"
             icon={Clock3}
-            trend="Needs attention"
-            trendType="neutral"
+            trend={
+              stats.pending > 0
+                ? "Needs attention"
+                : "All reviewed"
+            }
+            trendType={
+              stats.pending > 0
+                ? "neutral"
+                : "positive"
+            }
           />
 
           <StatCard
@@ -234,11 +333,42 @@ function GovernmentDashboard() {
 
           <StatCard
             title="Validated"
-            value="1"
+            value={
+              loadingStats && stats.validated === 0
+                ? "..."
+                : String(stats.validated)
+            }
             description="Successfully verified"
             icon={FileCheck2}
-            trend="33% of reports"
+            trend={
+              stats.total > 0
+                ? `${Math.round(
+                    (stats.validated / stats.total) * 100
+                  )}% of reports`
+                : "0% of reports"
+            }
             trendType="positive"
+          />
+
+          <StatCard
+            title="Rejected"
+            value={
+              loadingStats && stats.rejected === 0
+                ? "..."
+                : String(stats.rejected)
+            }
+            description="Rejected after government review"
+            icon={XCircle}
+            trend={
+              stats.rejected > 0
+                ? "Review outcome"
+                : "No rejected reports"
+            }
+            trendType={
+              stats.rejected > 0
+                ? "negative"
+                : "neutral"
+            }
           />
         </section>
 
@@ -248,7 +378,8 @@ function GovernmentDashboard() {
         <section
           style={{
             display: "grid",
-            gridTemplateColumns: "minmax(0, 1.15fr) minmax(300px, 0.85fr)",
+            gridTemplateColumns:
+              "minmax(0, 1.15fr) minmax(300px, 0.85fr)",
             gap: "20px",
             marginBottom: "24px",
           }}
@@ -262,7 +393,7 @@ function GovernmentDashboard() {
           <ImpactCard
             projects={3}
             people={12}
-            resolved={1}
+            resolved={stats.validated}
           />
         </section>
 
@@ -276,7 +407,8 @@ function GovernmentDashboard() {
             borderRadius: "18px",
             padding: "24px",
             marginBottom: "24px",
-            boxShadow: "0 8px 25px rgba(74, 74, 74, 0.05)",
+            boxShadow:
+              "0 8px 25px rgba(74, 74, 74, 0.05)",
           }}
         >
           <div
@@ -423,7 +555,8 @@ function GovernmentDashboard() {
               border: "1px solid #E2B4BD",
               borderRadius: "18px",
               padding: "24px",
-              boxShadow: "0 8px 25px rgba(74, 74, 74, 0.05)",
+              boxShadow:
+                "0 8px 25px rgba(74, 74, 74, 0.05)",
               minWidth: 0,
             }}
           >
@@ -482,7 +615,8 @@ function GovernmentDashboard() {
                     backgroundColor: "#4A4A4A",
                   }}
                 />
-                3 Active
+
+                {stats.pending} Active
               </div>
             </div>
 
@@ -545,7 +679,8 @@ function GovernmentDashboard() {
                               fontSize: "11px",
                               padding: "4px 8px",
                               borderRadius: "999px",
-                              backgroundColor: priority.background,
+                              backgroundColor:
+                                priority.background,
                               color: priority.color,
                               border: `1px solid ${priority.border}`,
                               fontWeight: 800,
@@ -626,6 +761,7 @@ function GovernmentDashboard() {
                         <span style={{ color: "#FFFFFF" }}>
                           Review Problem
                         </span>
+
                         <ArrowRight
                           size={15}
                           style={{ color: "#FFFFFF" }}
@@ -677,7 +813,12 @@ function GovernmentDashboard() {
             <Users size={20} />
           </div>
 
-          <div style={{ flex: 1, minWidth: "220px" }}>
+          <div
+            style={{
+              flex: 1,
+              minWidth: "220px",
+            }}
+          >
             <h3
               style={{
                 margin: 0,
@@ -717,8 +858,14 @@ function GovernmentDashboard() {
               fontWeight: 800,
             }}
           >
-            <span style={{ color: "#4A4A4A" }}>View Opportunity</span>
-            <ArrowRight size={15} style={{ color: "#4A4A4A" }} />
+            <span style={{ color: "#4A4A4A" }}>
+              View Opportunity
+            </span>
+
+            <ArrowRight
+              size={15}
+              style={{ color: "#4A4A4A" }}
+            />
           </button>
         </section>
       </main>

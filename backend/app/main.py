@@ -9,10 +9,13 @@ from app.models.user import User
 from app.models.problem import Problem
 from app.models.problem_status_history import ProblemStatusHistory
 from app.models.password_reset_token import PasswordResetToken
+from app.models.notification import Notification
 
 from app.routes.auth import router as auth_router
 from app.routes.problems import router as problems_router
 from app.routes.government import router as government_router
+from app.routes.government_stats import router as government_stats_router
+from app.routes.notifications import router as notifications_router
 
 
 # ============================================================
@@ -78,6 +81,8 @@ app.mount(
 app.include_router(auth_router)
 app.include_router(problems_router)
 app.include_router(government_router)
+app.include_router(government_stats_router)
+app.include_router(notifications_router)
 
 
 # ============================================================
