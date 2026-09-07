@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   ArrowLeft,
@@ -138,10 +137,19 @@ function Login() {
     return userRole === portal.role;
   };
 
+  /*
+   * Redirect user to the correct dashboard
+   * after successful authentication.
+   *
+   * Citizen should land on the Citizen Dashboard.
+   * My Problems opens only after the citizen
+   * chooses Report Problem / My Problems flow.
+   */
+
   const getDashboardPath = (role) => {
     switch (role) {
       case "CITIZEN":
-        return "/citizen/problems";
+        return "/citizen";
 
       case "GOVERNMENT":
         return "/government";
@@ -199,7 +207,9 @@ function Login() {
         email: formData.email,
         password: formData.password,
       });
+
       console.log("LOGIN USER:", user);
+
       /*
        * Authentication succeeded, but we still verify
        * whether the account belongs to this portal.

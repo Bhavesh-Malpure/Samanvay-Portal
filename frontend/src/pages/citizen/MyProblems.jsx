@@ -1,6 +1,6 @@
-
 import {
   AlertCircle,
+  ArrowLeft,
   CheckCircle2,
   Clock3,
   Filter,
@@ -148,7 +148,9 @@ function MyProblems() {
 
   const categories = useMemo(() => {
     const uniqueCategories = [
-      ...new Set(problems.map((problem) => getCategory(problem))),
+      ...new Set(
+        problems.map((problem) => getCategory(problem))
+      ),
     ];
 
     return uniqueCategories.sort();
@@ -242,6 +244,17 @@ function MyProblems() {
   return (
     <div className="min-h-screen bg-[#FFF5F5] px-4 py-6 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
+
+        {/* Back to Dashboard */}
+        <div className="mb-6">
+          <Link
+            to="/citizen"
+            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900"
+          >
+            <ArrowLeft size={18} />
+            <span>Back to Dashboard</span>
+          </Link>
+        </div>
 
         {/* Header */}
         <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
