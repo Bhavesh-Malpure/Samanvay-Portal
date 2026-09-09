@@ -1,13 +1,19 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { AuthProvider } from "./context/AuthContext";
-import { LocationProvider } from "./context/LocationContext";
+import { LocationProvider, useLocation } from "./context/LocationContext";
 import { NotificationProvider } from "./context/NotificationContext";
 
+import ProtectedRoute from "./components/common/ProtectedRoute";
+
+// Public
 import LocationGate from "./pages/LocationGate";
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Unauthorized from "./pages/Unauthorized";
 
 // Citizen
 import CitizenDashboard from "./pages/citizen/CitizenDashboard";
@@ -17,6 +23,7 @@ import ProblemDetails from "./pages/citizen/ProblemDetails";
 
 // Government
 import GovernmentDashboard from "./pages/government/GovernmentDashboard";
+import GovernmentAnalytics from "./pages/government/GovernmentAnalytics";
 import ProblemValidation from "./pages/government/ProblemValidation";
 import ProblemRouting from "./pages/government/ProblemRouting";
 
@@ -27,205 +34,286 @@ import FacultyDashboard from "./pages/university/FacultyDashboard";
 import UniversityAdminDashboard from "./pages/university/UniversityAdminDashboard";
 import Projects from "./pages/university/Projects";
 
-// University Workspaces
-import StudentWorkspace from "./components/university/StudentWorkspace";
-import FacultyWorkspace from "./components/university/FacultyWorkspace";
-import UniversityAdmin from "./components/university/UniversityAdmin";
-import TeamManagement from "./components/university/TeamManagement";
-import ProjectAllocation from "./components/university/ProjectAllocation";
-
 // Industry
 import IndustryDashboard from "./pages/industry/IndustryDashboard";
 import IndustryProjects from "./pages/industry/IndustryProjects";
-
-// Industry Components
 import IndustryProfile from "./components/industry/IndustryProfile";
 import CollaborationRequests from "./components/industry/CollaborationRequests";
 
-// Project System
-import ProjectWorkspace from "./pages/projects/ProjectWorkspace";
+// Projects
 import ProjectDetails from "./pages/projects/ProjectDetails";
+import ProjectWorkspace from "./pages/projects/ProjectWorkspace";
+
+
+function AppContent() {
+  const { isGranted } = useLocation();
+
+  return (
+    <>
+      {/* Main Portal */}
+      <Routes>
+        {/* PUBLIC */}
+        <Route
+          path="/"
+          element={<LandingPage />}
+        />
+
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+        <Route
+          path="/login/:portal"
+          element={<Login />}
+        />
+
+        <Route
+          path="/register"
+          element={<Register />}
+        />
+
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
+
+        <Route
+          path="/reset-password"
+          element={<ResetPassword />}
+        />
+
+        <Route
+          path="/unauthorized"
+          element={<Unauthorized />}
+        />
+
+        {/* CITIZEN */}
+        <Route
+          path="/citizen"
+          element={
+            <ProtectedRoute allowedRoles={["CITIZEN"]}>
+              <CitizenDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/citizen/submit"
+          element={
+            <ProtectedRoute allowedRoles={["CITIZEN"]}>
+              <SubmitProblem />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/citizen/problems"
+          element={
+            <ProtectedRoute allowedRoles={["CITIZEN"]}>
+              <MyProblems />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/citizen/problems/:id"
+          element={
+            <ProtectedRoute allowedRoles={["CITIZEN"]}>
+              <ProblemDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* GOVERNMENT */}
+        <Route
+          path="/government"
+          element={
+            <ProtectedRoute allowedRoles={["GOVERNMENT"]}>
+              <GovernmentDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/government/analytics"
+          element={
+            <ProtectedRoute allowedRoles={["GOVERNMENT"]}>
+              <GovernmentAnalytics />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/government/validation"
+          element={
+            <ProtectedRoute allowedRoles={["GOVERNMENT"]}>
+              <ProblemValidation />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/government/routing"
+          element={
+            <ProtectedRoute allowedRoles={["GOVERNMENT"]}>
+              <ProblemRouting />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* UNIVERSITY */}
+        <Route
+          path="/university"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "UNIVERSITY_STUDENT",
+                "UNIVERSITY_MENTOR",
+                "UNIVERSITY_AUTHORITY",
+              ]}
+            >
+              <UniversityDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/university/student"
+          element={
+            <ProtectedRoute allowedRoles={["UNIVERSITY_STUDENT"]}>
+              <StudentDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+  path="/university/student/workspace"
+  element={
+    <ProtectedRoute allowedRoles={["UNIVERSITY_STUDENT"]}>
+      <ProjectWorkspace />
+    </ProtectedRoute>
+  }
+/>
+        <Route
+          path="/university/faculty"
+          element={
+            <ProtectedRoute allowedRoles={["UNIVERSITY_MENTOR"]}>
+              <FacultyDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/university/admin"
+          element={
+            <ProtectedRoute allowedRoles={["UNIVERSITY_AUTHORITY"]}>
+              <UniversityAdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/university/projects"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "UNIVERSITY_STUDENT",
+                "UNIVERSITY_MENTOR",
+                "UNIVERSITY_AUTHORITY",
+              ]}
+            >
+              <Projects />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* INDUSTRY */}
+        <Route
+          path="/industry"
+          element={
+            <ProtectedRoute allowedRoles={["INDUSTRY"]}>
+              <IndustryDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+  path="/industry/collaboration-requests"
+  element={
+    <ProtectedRoute allowedRoles={["INDUSTRY"]}>
+      <CollaborationRequests />
+    </ProtectedRoute>
+  }
+/>
+        <Route
+          path="/industry/projects"
+          element={
+            <ProtectedRoute allowedRoles={["INDUSTRY"]}>
+              <IndustryProjects />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+  path="/industry/profile"
+  element={
+    <ProtectedRoute allowedRoles={["INDUSTRY"]}>
+      <IndustryProfile />
+    </ProtectedRoute>
+  }
+/>
+
+        {/* PROJECTS */}
+        <Route
+          path="/project-details"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "UNIVERSITY_STUDENT",
+                "UNIVERSITY_MENTOR",
+                "UNIVERSITY_AUTHORITY",
+                "INDUSTRY",
+              ]}
+            >
+              <ProjectDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/project-workspace"
+          element={
+            <ProtectedRoute
+              allowedRoles={[
+                "UNIVERSITY_STUDENT",
+                "UNIVERSITY_MENTOR",
+                "UNIVERSITY_AUTHORITY",
+                "INDUSTRY",
+              ]}
+            >
+              <ProjectWorkspace />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* FALLBACK */}
+        <Route
+          path="*"
+          element={<Navigate to="/" replace />}
+        />
+      </Routes>
+
+      {/* Location Popup */}
+      {!isGranted && <LocationGate />}
+    </>
+  );
+}
+
 
 function App() {
   return (
     <AuthProvider>
       <LocationProvider>
         <NotificationProvider>
-          <Routes>
-
-            {/* =================================================
-                ENTRY
-                ================================================= */}
-
-            <Route
-              path="/location"
-              element={<LocationGate />}
-            />
-
-            <Route
-              path="/"
-              element={<LandingPage />}
-            />
-
-            <Route
-              path="/login"
-              element={<Login />}
-            />
-
-            <Route
-              path="/register"
-              element={<Register />}
-            />
-
-            {/* =================================================
-                CITIZEN
-                ================================================= */}
-
-            <Route
-              path="/citizen"
-              element={<CitizenDashboard />}
-            />
-
-            <Route
-              path="/citizen/submit"
-              element={<SubmitProblem />}
-            />
-
-            <Route
-              path="/citizen/problems"
-              element={<MyProblems />}
-            />
-
-            <Route
-              path="/citizen/problems/:id"
-              element={<ProblemDetails />}
-            />
-
-            {/* =================================================
-                GOVERNMENT
-                ================================================= */}
-
-            <Route
-              path="/government"
-              element={<GovernmentDashboard />}
-            />
-
-            <Route
-              path="/government/validation"
-              element={<ProblemValidation />}
-            />
-
-            <Route
-              path="/government/routing"
-              element={<ProblemRouting />}
-            />
-
-            {/* =================================================
-                UNIVERSITY
-                ================================================= */}
-
-            <Route
-              path="/university"
-              element={<UniversityDashboard />}
-            />
-
-            <Route
-              path="/university/student"
-              element={<StudentDashboard />}
-            />
-
-            <Route
-              path="/university/faculty"
-              element={<FacultyDashboard />}
-            />
-
-            <Route
-              path="/university/admin"
-              element={<UniversityAdminDashboard />}
-            />
-
-            <Route
-              path="/university/projects"
-              element={<Projects />}
-            />
-
-            {/* =================================================
-                UNIVERSITY WORKSPACES
-                ================================================= */}
-
-            <Route
-              path="/university/student/workspace"
-              element={<StudentWorkspace />}
-            />
-
-            <Route
-              path="/university/faculty/workspace"
-              element={<FacultyWorkspace />}
-            />
-
-            <Route
-              path="/university/admin/workspace"
-              element={<UniversityAdmin />}
-            />
-
-            <Route
-              path="/university/teams"
-              element={<TeamManagement />}
-            />
-
-            <Route
-              path="/university/allocation"
-              element={<ProjectAllocation />}
-            />
-
-            {/* =================================================
-                INDUSTRY
-                ================================================= */}
-
-            <Route
-              path="/industry"
-              element={<IndustryDashboard />}
-            />
-
-            <Route
-              path="/industry/projects"
-              element={<IndustryProjects />}
-            />
-
-            <Route
-              path="/industry/profile"
-              element={<IndustryProfile />}
-            />
-
-            <Route
-              path="/industry/collaboration-requests"
-              element={<CollaborationRequests />}
-            />
-
-            {/* =================================================
-                PROJECT SYSTEM
-                ================================================= */}
-
-            <Route
-              path="/project-workspace"
-              element={<ProjectWorkspace />}
-            />
-
-            <Route
-              path="/project-details"
-              element={<ProjectDetails />}
-            />
-
-            {/* =================================================
-                FUTURE MODULES / FALLBACK
-                ================================================= */}
-
-            <Route
-              path="*"
-              element={<Navigate to="/location" replace />}
-            />
-
-          </Routes>
+          <AppContent />
         </NotificationProvider>
       </LocationProvider>
     </AuthProvider>

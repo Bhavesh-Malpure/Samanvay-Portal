@@ -1,14 +1,40 @@
-import { ArrowLeft, CheckCircle2, MapPin, Send } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Loader2,
+  MapPin,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+
 import ProblemForm from "../../components/problems/ProblemForm";
+import { createProblem } from "../../services/problemService";
 
 function SubmitProblem() {
   const navigate = useNavigate();
 
-  const handleSubmit = (formData) => {
-    console.log("Problem submitted:", formData);
+  const handleSubmit = async (formData) => {
+    try {
+      const submittedProblem = await createProblem(formData);
 
-    navigate("/citizen/problems");
+      console.log(
+        "Problem created successfully:",
+        submittedProblem
+      );
+
+      navigate("/citizen/problems", {
+        replace: true,
+      });
+    } catch (error) {
+      console.error(
+        "Problem submission failed:",
+        error
+      );
+
+      alert(
+        error.message ||
+          "Unable to submit problem. Please try again."
+      );
+    }
   };
 
   return (
@@ -47,8 +73,9 @@ function SubmitProblem() {
             </h2>
 
             <p className="mt-4 leading-7 text-[#4A4A4A]/70">
-              Provide clear information about the issue. Your submission will
-              later be analyzed and routed to the appropriate stakeholders.
+              Provide clear information about the issue. Your
+              submission will later be analyzed and routed to
+              the appropriate stakeholders.
             </p>
           </div>
         </div>
@@ -74,11 +101,15 @@ function SubmitProblem() {
         </div>
 
         <div className="mt-6 flex items-start gap-3 rounded-2xl border border-[#E2B4BD]/40 bg-white p-5">
-          <CheckCircle2 size={19} className="mt-0.5 shrink-0" />
+          <CheckCircle2
+            size={19}
+            className="mt-0.5 shrink-0"
+          />
 
           <p className="text-sm leading-6 text-[#4A4A4A]/60">
-            By submitting this problem, you confirm that the information
-            provided is accurate to the best of your knowledge.
+            By submitting this problem, you confirm that the
+            information provided is accurate to the best of your
+            knowledge.
           </p>
         </div>
       </main>
