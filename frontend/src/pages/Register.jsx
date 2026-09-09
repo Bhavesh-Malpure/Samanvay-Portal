@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   ArrowLeft,
@@ -8,6 +9,7 @@ import {
   Loader2,
   AlertCircle,
   LockKeyhole,
+  ChevronLeft,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -26,9 +28,11 @@ function Register() {
     district: "",
   });
 
+  const [universityRoleOpen, setUniversityRoleOpen] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Main registration options
   const roles = [
     {
       value: "CITIZEN",
@@ -43,7 +47,7 @@ function Register() {
       icon: Landmark,
     },
     {
-      value: "UNIVERSITY_STUDENT",
+      value: "UNIVERSITY",
       label: "University",
       description: "Develop and manage solutions.",
       icon: GraduationCap,
@@ -53,6 +57,25 @@ function Register() {
       label: "Industry",
       description: "Collaborate and support projects.",
       icon: Building2,
+    },
+  ];
+
+  // University sub-roles
+  const universityRoles = [
+    {
+      value: "UNIVERSITY_STUDENT",
+      label: "University Student",
+      description: "Work on projects and develop solutions.",
+    },
+    {
+      value: "UNIVERSITY_MENTOR",
+      label: "University Mentor",
+      description: "Guide students and manage projects.",
+    },
+    {
+      value: "UNIVERSITY_AUTHORITY",
+      label: "University Authority",
+      description: "Manage university-level activities.",
     },
   ];
 
@@ -67,6 +90,38 @@ function Register() {
     if (error) {
       setError("");
     }
+  };
+
+  const handleMainRoleChange = (role) => {
+    setError("");
+
+    if (role === "UNIVERSITY") {
+      setUniversityRoleOpen(true);
+
+      // Default university role
+      setFormData((previous) => ({
+        ...previous,
+        role: "UNIVERSITY_STUDENT",
+      }));
+
+      return;
+    }
+
+    setUniversityRoleOpen(false);
+
+    setFormData((previous) => ({
+      ...previous,
+      role,
+    }));
+  };
+
+  const handleUniversityRoleChange = (role) => {
+    setFormData((previous) => ({
+      ...previous,
+      role,
+    }));
+
+    setError("");
   };
 
   /*
@@ -98,6 +153,20 @@ function Register() {
     event.preventDefault();
 
     setError("");
+
+    // University must have a valid sub-role
+    if (
+      universityRoleOpen &&
+      ![
+        "UNIVERSITY_STUDENT",
+        "UNIVERSITY_MENTOR",
+        "UNIVERSITY_AUTHORITY",
+      ].includes(formData.role)
+    ) {
+      setError("Please select your university role.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -109,15 +178,6 @@ function Register() {
         role: formData.role,
         district: formData.district || null,
       });
-
-      /*
-       * Registration creates the account.
-       *
-       * Backend registration does not currently return
-       * a JWT token, so the user must login separately.
-       *
-       * We send them directly to the correct portal.
-       */
 
       const loginPortal = getLoginPortal(formData.role);
 
@@ -180,7 +240,6 @@ function Register() {
           </div>
         )}
 
-        {/* Registration Form */}
         <form
           onSubmit={handleSubmit}
           className="space-y-5"
@@ -290,6 +349,13 @@ function Register() {
               {roles.map((role) => {
                 const Icon = role.icon;
 
+                const isUniversity =
+                  role.value === "UNIVERSITY";
+
+                const isSelected = isUniversity
+                  ? universityRoleOpen
+                  : formData.role === role.value;
+
                 return (
                   <label
                     key={role.value}
@@ -297,15 +363,23 @@ function Register() {
                   >
                     <input
                       type="radio"
-                      name="role"
+                      name="mainRole"
                       value={role.value}
-                      checked={formData.role === role.value}
-                      onChange={handleChange}
+                      checked={isSelected}
+                      onChange={() =>
+                        handleMainRoleChange(role.value)
+                      }
                       disabled={loading}
                       className="peer sr-only"
                     />
 
-                    <div className="rounded-2xl border border-[#E2B4BD]/50 p-4 transition hover:bg-[#FFF5F5] peer-checked:border-[#4A4A4A] peer-checked:bg-[#F7D6D0]">
+                    <div
+                      className={`rounded-2xl border p-4 transition hover:bg-[#FFF5F5] ${
+                        isSelected
+                          ? "border-[#4A4A4A] bg-[#F7D6D0]"
+                          : "border-[#E2B4BD]/50"
+                      }`}
+                    >
                       <Icon
                         size={20}
                         className="text-[#4A4A4A]"
@@ -324,6 +398,72 @@ function Register() {
               })}
             </div>
           </div>
+
+          {/* University Sub-Role */}
+          {universityRoleOpen && (
+            <div className="rounded-2xl border border-[#E2B4BD]/60 bg-[#FFF5F5] p-4">
+              <div className="mb-4 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUniversityRoleOpen(false);
+                    setFormData((previous) => ({
+                      ...previous,
+                      role: "CITIZEN",
+                    }));
+                  }}
+                  disabled={loading}
+                  className="rounded-lg p-1 text-[#4A4A4A]/60 transition hover:bg-white hover:text-[#4A4A4A]"
+                >
+                  <ChevronLeft size={18} />
+                </button>
+
+                <div>
+                  <p className="text-sm font-semibold text-[#4A4A4A]">
+                    Select University Role
+                  </p>
+
+                  <p className="text-xs text-[#4A4A4A]/55">
+                    Choose how you are joining the university
+                    portal.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {universityRoles.map((role) => (
+                  <label
+                    key={role.value}
+                    className="block cursor-pointer"
+                  >
+                    <input
+                      type="radio"
+                      name="universityRole"
+                      value={role.value}
+                      checked={formData.role === role.value}
+                      onChange={() =>
+                        handleUniversityRoleChange(
+                          role.value
+                        )
+                      }
+                      disabled={loading}
+                      className="peer sr-only"
+                    />
+
+                    <div className="rounded-xl border border-[#E2B4BD]/50 bg-white p-3 transition hover:bg-[#FFF5F5] peer-checked:border-[#4A4A4A] peer-checked:bg-[#F7D6D0]">
+                      <p className="text-sm font-semibold text-[#4A4A4A]">
+                        {role.label}
+                      </p>
+
+                      <p className="mt-1 text-xs leading-5 text-[#4A4A4A]/55">
+                        {role.description}
+                      </p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Password */}
           <div>

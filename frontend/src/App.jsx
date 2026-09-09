@@ -37,6 +37,8 @@ import Projects from "./pages/university/Projects";
 // Industry
 import IndustryDashboard from "./pages/industry/IndustryDashboard";
 import IndustryProjects from "./pages/industry/IndustryProjects";
+import IndustryProfile from "./components/industry/IndustryProfile";
+import CollaborationRequests from "./components/industry/CollaborationRequests";
 
 // Projects
 import ProjectDetails from "./pages/projects/ProjectDetails";
@@ -184,7 +186,14 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+  path="/university/student/workspace"
+  element={
+    <ProtectedRoute allowedRoles={["UNIVERSITY_STUDENT"]}>
+      <ProjectWorkspace />
+    </ProtectedRoute>
+  }
+/>
         <Route
           path="/university/faculty"
           element={
@@ -227,7 +236,14 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+  path="/industry/collaboration-requests"
+  element={
+    <ProtectedRoute allowedRoles={["INDUSTRY"]}>
+      <CollaborationRequests />
+    </ProtectedRoute>
+  }
+/>
         <Route
           path="/industry/projects"
           element={
@@ -236,6 +252,14 @@ function AppContent() {
             </ProtectedRoute>
           }
         />
+        <Route
+  path="/industry/profile"
+  element={
+    <ProtectedRoute allowedRoles={["INDUSTRY"]}>
+      <IndustryProfile />
+    </ProtectedRoute>
+  }
+/>
 
         {/* PROJECTS */}
         <Route

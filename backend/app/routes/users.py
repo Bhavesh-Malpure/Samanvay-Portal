@@ -1,39 +1,86 @@
-from sqlalchemy import Boolean, Column, DateTime, Integer, String
-from sqlalchemy.sql import func
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, EmailStr
+from sqlalchemy.orm import Session
 
-from app.core.database import Base
+from app.core.database import get_db
+from app.core.security import get_current_user
+from app.models.user import User
 
 
-class User(Base):
-    __tablename__ = "users"
+router = APIRouter(
+    prefix="/api/users",
+    tags=["Users"],
+)
 
-    id = Column(Integer, primary_key=True, index=True)
 
-    name = Column(String(100), nullable=False)
+# ============================================================
+# PROFILE SCHEMAS
+# ============================================================
 
-    email = Column(
-        String(255),
-        unique=True,
-        index=True,
-        nullable=False,
-    )
+class ProfileResponse(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+    phone: str | None
+    role: str
+    district: str | None
+    is_active: bool
 
-    password_hash = Column(String(255), nullable=False)
+    class Config:
+        from_attributes = True
 
-    phone = Column(String(20), nullable=True)
 
-    role = Column(String(50), nullable=False)
+class ProfileUpdateRequest(BaseModel):
+    name: str | None = None
+    phone: str | None = None
+    district: str | None = None
 
-    district = Column(String(100), nullable=True)
 
-    is_active = Column(
-        Boolean,
-        default=True,
-        nullable=False,
-    )
+# ============================================================
+# GET CURRENT USER PROFILE
+# ============================================================
 
-    created_at = Column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        nullable=False,
-    )
+@router.get(
+    "/profile",
+    response_model=ProfileResponse,
+)
+def get_profile(
+    current_user: User = Depends(get_current_user),
+):
+    return current_user
+
+
+# ============================================================
+# UPDATE CURRENT USER PROFILE
+# ============================================================
+
+@router.put(
+    "/profile",
+    response_model=ProfileResponse,
+)
+def update_profile(
+    data: ProfileUpdateRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if data.name is not None:
+        name = data.name.strip()
+
+        if not name:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Name cannot be empty",
+            )
+
+        current_user.name = name
+
+    if data.phone is not None:
+        current_user.phone = data.phone.strip() or None
+
+    if data.district is not None:
+        current_user.district = data.district.strip() or None
+
+    db.commit()
+    db.refresh(current_user)
+
+    return current_user

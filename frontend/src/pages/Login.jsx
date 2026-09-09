@@ -56,6 +56,30 @@ const portalConfig = {
     icon: GraduationCap,
     accent: "University",
     dashboard: "/university/student",
+
+    roles: [
+      {
+        role: "UNIVERSITY_STUDENT",
+        label: "Student",
+        description:
+          "Work on civic projects, manage tasks, and collaborate with your team.",
+        dashboard: "/university/student",
+      },
+      {
+        role: "UNIVERSITY_MENTOR",
+        label: "Faculty / Mentor",
+        description:
+          "Guide student teams, review projects, and support solutions.",
+        dashboard: "/university/faculty",
+      },
+      {
+        role: "UNIVERSITY_AUTHORITY",
+        label: "Higher Authority",
+        description:
+          "Manage university activities, projects, and institutional coordination.",
+        dashboard: "/university/admin",
+      },
+    ],
   },
 
   industry: {
@@ -88,6 +112,16 @@ function Login() {
 
   const portal = portalConfig[portalKey];
   const PortalIcon = portal?.icon;
+
+  /*
+   * University role can be selected using:
+   * /login/university?role=UNIVERSITY_STUDENT
+   * /login/university?role=UNIVERSITY_MENTOR
+   * /login/university?role=UNIVERSITY_AUTHORITY
+   */
+
+  const selectedUniversityRole =
+    new URLSearchParams(location.search).get("role");
 
   const registeredSuccessfully =
     location.state?.registered === true;
@@ -127,6 +161,17 @@ function Login() {
     }
 
     if (portalKey === "university") {
+      /*
+       * If a specific University role was selected,
+       * only that role is allowed.
+       */
+      if (selectedUniversityRole) {
+        return userRole === selectedUniversityRole;
+      }
+
+      /*
+       * Otherwise all University roles are allowed.
+       */
       return [
         "UNIVERSITY_STUDENT",
         "UNIVERSITY_MENTOR",
@@ -140,10 +185,6 @@ function Login() {
   /*
    * Redirect user to the correct dashboard
    * after successful authentication.
-   *
-   * Citizen should land on the Citizen Dashboard.
-   * My Problems opens only after the citizen
-   * chooses Report Problem / My Problems flow.
    */
 
   const getDashboardPath = (role) => {
@@ -196,6 +237,22 @@ function Login() {
     }
   };
 
+  const getUniversityRoleLabel = (role) => {
+    switch (role) {
+      case "UNIVERSITY_STUDENT":
+        return "Student";
+
+      case "UNIVERSITY_MENTOR":
+        return "Faculty / Mentor";
+
+      case "UNIVERSITY_AUTHORITY":
+        return "Higher Authority";
+
+      default:
+        return "University";
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -218,9 +275,20 @@ function Login() {
       if (!isAllowedRole(user.role)) {
         const actualRole = getRoleName(user.role);
 
-        setError(
-          `This account is registered as ${actualRole}. Please use the ${actualRole} login portal.`
-        );
+        if (
+          portalKey === "university" &&
+          selectedUniversityRole
+        ) {
+          setError(
+            `This account is registered as ${actualRole}. Please select ${getUniversityRoleLabel(
+              user.role
+            )} from the University portal.`
+          );
+        } else {
+          setError(
+            `This account is registered as ${actualRole}. Please use the ${actualRole} login portal.`
+          );
+        }
 
         return;
       }
@@ -381,6 +449,71 @@ function Login() {
           </p>
         </div>
 
+        {/* University Role Selection */}
+        {portalKey === "university" && (
+          <div className="mb-7">
+            <p className="mb-3 text-sm font-semibold text-[#4A4A4A]">
+              Select your role
+            </p>
+
+            <div className="grid gap-3">
+              {portal.roles.map((item) => {
+                const isSelected =
+                  selectedUniversityRole === item.role;
+
+                return (
+                  <button
+                    key={item.role}
+                    type="button"
+                    onClick={() => {
+                      setError("");
+
+                      navigate(
+                        `/login/university?role=${item.role}`
+                      );
+                    }}
+                    className={`flex w-full items-center justify-between rounded-xl border p-4 text-left transition ${
+                      isSelected
+                        ? "border-[#4A4A4A] bg-[#F7D6D0]"
+                        : "border-[#E2B4BD]/60 bg-[#FFF5F5] hover:border-[#4A4A4A] hover:bg-[#F7D6D0]"
+                    }`}
+                  >
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-[#4A4A4A]">
+                        {item.label}
+                      </p>
+
+                      <p className="mt-1 text-xs leading-5 text-[#4A4A4A]/55">
+                        {item.description}
+                      </p>
+                    </div>
+
+                    <ArrowRight
+                      size={17}
+                      className={`ml-3 shrink-0 text-[#4A4A4A]/40 transition ${
+                        isSelected
+                          ? "translate-x-1 text-[#4A4A4A]"
+                          : ""
+                      }`}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+
+            {selectedUniversityRole && (
+              <p className="mt-3 text-xs text-[#4A4A4A]/55">
+                Signing in as{" "}
+                <strong>
+                  {getUniversityRoleLabel(
+                    selectedUniversityRole
+                  )}
+                </strong>
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Registration Success */}
         {registeredSuccessfully && (
           <div className="mb-5 flex items-start gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
@@ -492,7 +625,11 @@ function Login() {
           {/* Submit */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={
+              loading ||
+              (portalKey === "university" &&
+                !selectedUniversityRole)
+            }
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#4A4A4A] py-3.5 font-semibold text-white transition hover:bg-[#4A4A4A]/90 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {loading ? (
@@ -505,7 +642,13 @@ function Login() {
               </>
             ) : (
               <>
-                Sign In to {portal.accent}
+                Sign In to{" "}
+                {portalKey === "university" &&
+                selectedUniversityRole
+                  ? getUniversityRoleLabel(
+                      selectedUniversityRole
+                    )
+                  : portal.accent}
                 <ArrowRight size={17} />
               </>
             )}

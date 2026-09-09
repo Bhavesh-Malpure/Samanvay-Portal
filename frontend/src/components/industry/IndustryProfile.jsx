@@ -1,130 +1,363 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
 function IndustryProfile() {
   const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const [profile, setProfile] = useState({
-    name: "Dhule Industrial Solutions Pvt. Ltd.",
-    industry: "Technology & Infrastructure",
-    location: "Dhule, Maharashtra",
-    contactPerson: "Industry Partnership Manager",
-    email: "partnerships@dhuleindustries.example",
-    phone: "+91 98765 43210",
-    website: "www.dhuleindustries.example",
-    description:
-      "Technology and infrastructure company supporting practical solutions for local societal and civic challenges.",
+    name: "",
+    email: "",
+    phone: "",
+    district: "",
+    role: "",
   });
 
+  // ============================================================
+  // LOAD PROFILE
+  // ============================================================
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      const token = localStorage.getItem("samanvay_token");
+
+      if (!token) {
+        setError("Your session has expired. Please login again.");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/users/profile`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            throw new Error(
+              "Your session has expired. Please login again."
+            );
+          }
+
+          throw new Error("Failed to load profile.");
+        }
+
+        const data = await response.json();
+
+        setProfile({
+          name: data.name || "",
+          email: data.email || "",
+          phone: data.phone || "",
+          district: data.district || "",
+          role: data.role || "",
+        });
+      } catch (err) {
+        console.error("Profile loading failed:", err);
+        setError(err.message || "Failed to load profile.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, []);
+
+  // ============================================================
+  // HANDLE CHANGE
+  // ============================================================
+
   const handleChange = (field, value) => {
-    setProfile({
-      ...profile,
+    setProfile((previous) => ({
+      ...previous,
       [field]: value,
-    });
+    }));
+
+    setMessage("");
+    setError("");
   };
+
+  // ============================================================
+  // SAVE PROFILE
+  // ============================================================
+
+  const handleSave = async () => {
+    const token = localStorage.getItem("samanvay_token");
+
+    if (!token) {
+      setError("Your session has expired. Please login again.");
+      return;
+    }
+
+    setSaving(true);
+    setMessage("");
+    setError("");
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/users/profile`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name: profile.name,
+            phone: profile.phone || null,
+            district: profile.district || null,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail || "Failed to update profile."
+        );
+      }
+
+      setProfile({
+        name: data.name || "",
+        email: data.email || "",
+        phone: data.phone || "",
+        district: data.district || "",
+        role: data.role || "",
+      });
+
+      setEditing(false);
+      setMessage("Profile updated successfully.");
+    } catch (err) {
+      console.error("Profile update failed:", err);
+      setError(err.message || "Failed to update profile.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleEditToggle = () => {
+    setMessage("");
+    setError("");
+
+    if (editing) {
+      handleSave();
+      return;
+    }
+
+    setEditing(true);
+  };
+
+  // ============================================================
+  // LOADING STATE
+  // ============================================================
+
+  if (loading) {
+    return (
+      <div style={styles.page}>
+        <div style={styles.container}>
+          <div style={styles.loadingCard}>
+            <div style={styles.spinner} />
+            <p style={styles.loadingText}>
+              Loading your profile...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ============================================================
+  // PROFILE
+  // ============================================================
+
+  const initials =
+    profile.name
+      ?.trim()
+      ?.charAt(0)
+      ?.toUpperCase() || "I";
+
+  const roleLabel = profile.role
+    ? profile.role.replaceAll("_", " ")
+    : "Industry Partner";
 
   return (
     <div style={styles.page}>
       <div style={styles.container}>
+        {/* =====================================================
+            HEADER
+        ====================================================== */}
+
         <div style={styles.header}>
           <div>
             <p style={styles.eyebrow}>INDUSTRY PROFILE</p>
+
             <h1 style={styles.title}>Industry Profile</h1>
+
             <p style={styles.subtitle}>
               Manage the information universities and project teams see.
             </p>
           </div>
 
           <button
-            style={editing ? styles.saveButton : styles.editButton}
-            onClick={() => setEditing(!editing)}
+            style={
+              editing
+                ? styles.saveButton
+                : styles.editButton
+            }
+            onClick={handleEditToggle}
+            disabled={saving}
           >
-            {editing ? "Save Profile" : "Edit Profile"}
+            {saving
+              ? "Saving..."
+              : editing
+              ? "Save Profile"
+              : "Edit Profile"}
           </button>
         </div>
 
+        {/* =====================================================
+            SUCCESS / ERROR MESSAGE
+        ====================================================== */}
+
+        {message && (
+          <div style={styles.successMessage}>
+            ✓ {message}
+          </div>
+        )}
+
+        {error && (
+          <div style={styles.errorMessage}>
+            {error}
+          </div>
+        )}
+
+        {/* =====================================================
+            PROFILE CARD
+        ====================================================== */}
+
         <div style={styles.profileCard}>
           <div style={styles.profileTop}>
-            <div style={styles.logo}>D</div>
+            <div style={styles.logo}>{initials}</div>
 
             <div>
-              <h2 style={styles.companyName}>{profile.name}</h2>
-              <p style={styles.companyType}>{profile.industry}</p>
-              <span style={styles.verified}>Verified Industry Partner</span>
+              <h2 style={styles.companyName}>
+                {profile.name || "Industry Partner"}
+              </h2>
+
+              <p style={styles.companyType}>
+                {roleLabel}
+              </p>
+
+              <span style={styles.verified}>
+                Verified Industry Partner
+              </span>
             </div>
           </div>
 
           <div style={styles.divider} />
 
           <div style={styles.formGrid}>
+            {/* NAME */}
+
             <Field
-              label="Company Name"
+              label="Name"
               value={profile.name}
               editing={editing}
-              onChange={(value) => handleChange("name", value)}
+              onChange={(value) =>
+                handleChange("name", value)
+              }
             />
 
-            <Field
-              label="Industry"
-              value={profile.industry}
-              editing={editing}
-              onChange={(value) => handleChange("industry", value)}
-            />
-
-            <Field
-              label="Location"
-              value={profile.location}
-              editing={editing}
-              onChange={(value) => handleChange("location", value)}
-            />
-
-            <Field
-              label="Contact Person"
-              value={profile.contactPerson}
-              editing={editing}
-              onChange={(value) => handleChange("contactPerson", value)}
-            />
+            {/* EMAIL - READ ONLY */}
 
             <Field
               label="Email"
               value={profile.email}
-              editing={editing}
-              onChange={(value) => handleChange("email", value)}
+              editing={false}
+              readOnly
             />
+
+            {/* PHONE */}
 
             <Field
               label="Phone"
               value={profile.phone}
               editing={editing}
-              onChange={(value) => handleChange("phone", value)}
+              onChange={(value) =>
+                handleChange("phone", value)
+              }
+              placeholder="Add phone number"
             />
 
+            {/* DISTRICT */}
+
             <Field
-              label="Website"
-              value={profile.website}
+              label="District"
+              value={profile.district}
               editing={editing}
-              onChange={(value) => handleChange("website", value)}
+              onChange={(value) =>
+                handleChange("district", value)
+              }
+              placeholder="Add district"
+            />
+
+            {/* ROLE - READ ONLY */}
+
+            <Field
+              label="Account Role"
+              value={roleLabel}
+              editing={false}
+              readOnly
+            />
+
+            {/* PROFILE STATUS */}
+
+            <Field
+              label="Profile Status"
+              value="Active"
+              editing={false}
+              readOnly
             />
           </div>
 
-          <div style={styles.descriptionBlock}>
-            <label style={styles.label}>About the Industry</label>
+          {/* ===================================================
+              PROFILE INFORMATION
+          ==================================================== */}
 
-            {editing ? (
-              <textarea
-                value={profile.description}
-                onChange={(e) =>
-                  handleChange("description", e.target.value)
-                }
-                style={styles.textarea}
-              />
-            ) : (
-              <p style={styles.description}>{profile.description}</p>
-            )}
+          <div style={styles.descriptionBlock}>
+            <label style={styles.label}>
+              Profile Information
+            </label>
+
+            <p style={styles.description}>
+              Your basic profile information is securely
+              managed through your Samanvay Portal account.
+              Universities and project teams can identify
+              your organization through your registered
+              account details.
+            </p>
           </div>
         </div>
 
+        {/* =====================================================
+            SUPPORT AREAS
+        ====================================================== */}
+
         <div style={styles.supportCard}>
-          <h2 style={styles.supportTitle}>Areas of Support</h2>
+          <h2 style={styles.supportTitle}>
+            Areas of Support
+          </h2>
 
           <div style={styles.tags}>
             {[
@@ -146,23 +379,50 @@ function IndustryProfile() {
   );
 }
 
-function Field({ label, value, editing, onChange }) {
+// ============================================================
+// FIELD COMPONENT
+// ============================================================
+
+function Field({
+  label,
+  value,
+  editing,
+  onChange,
+  readOnly = false,
+  placeholder = "",
+}) {
   return (
     <div>
       <label style={styles.label}>{label}</label>
 
-      {editing ? (
+      {editing && !readOnly ? (
         <input
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
           style={styles.input}
         />
       ) : (
-        <div style={styles.value}>{value}</div>
+        <div
+          style={
+            readOnly
+              ? {
+                  ...styles.value,
+                  ...styles.readOnlyValue,
+                }
+              : styles.value
+          }
+        >
+          {value || "Not provided"}
+        </div>
       )}
     </div>
   );
 }
+
+// ============================================================
+// STYLES
+// ============================================================
 
 const styles = {
   page: {
@@ -182,6 +442,7 @@ const styles = {
     justifyContent: "space-between",
     alignItems: "flex-start",
     marginBottom: "25px",
+    gap: "20px",
   },
 
   eyebrow: {
@@ -222,6 +483,51 @@ const styles = {
     cursor: "pointer",
   },
 
+  successMessage: {
+    background: "#EEF8F0",
+    border: "1px solid #B8DDBE",
+    color: "#34723D",
+    padding: "12px 15px",
+    borderRadius: "10px",
+    marginBottom: "18px",
+    fontSize: "13px",
+    fontWeight: "600",
+  },
+
+  errorMessage: {
+    background: "#FFF0F0",
+    border: "1px solid #E5B4B4",
+    color: "#A33A3A",
+    padding: "12px 15px",
+    borderRadius: "10px",
+    marginBottom: "18px",
+    fontSize: "13px",
+    fontWeight: "600",
+  },
+
+  loadingCard: {
+    background: "#FFFFFF",
+    border: "1px solid #E2B4BD",
+    borderRadius: "18px",
+    padding: "60px 30px",
+    textAlign: "center",
+  },
+
+  spinner: {
+    width: "28px",
+    height: "28px",
+    border: "3px solid #F7D6D0",
+    borderTop: "3px solid #4A4A4A",
+    borderRadius: "50%",
+    margin: "0 auto 15px",
+  },
+
+  loadingText: {
+    margin: 0,
+    color: "#777",
+    fontSize: "14px",
+  },
+
   profileCard: {
     background: "#FFFFFF",
     border: "1px solid #E2B4BD",
@@ -255,6 +561,7 @@ const styles = {
   companyType: {
     margin: "5px 0 9px",
     color: "#777",
+    textTransform: "capitalize",
   },
 
   verified: {
@@ -294,26 +601,22 @@ const styles = {
     borderRadius: "8px",
     outline: "none",
     background: "#FFF5F5",
+    color: "#4A4A4A",
+    fontSize: "14px",
   },
 
   value: {
     padding: "11px 0",
     fontSize: "14px",
+    minHeight: "20px",
+  },
+
+  readOnlyValue: {
+    color: "#777",
   },
 
   descriptionBlock: {
     marginTop: "24px",
-  },
-
-  textarea: {
-    width: "100%",
-    minHeight: "110px",
-    boxSizing: "border-box",
-    padding: "12px",
-    border: "1px solid #E2B4BD",
-    borderRadius: "8px",
-    resize: "vertical",
-    background: "#FFF5F5",
   },
 
   description: {

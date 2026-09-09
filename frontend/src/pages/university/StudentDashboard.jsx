@@ -1,5 +1,7 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { getProjects } from "../../services/projectService";
 
 const COLORS = {
   background: "#FFF5F5",
@@ -7,23 +9,6 @@ const COLORS = {
   accent: "#E2B4BD",
   text: "#4A4A4A",
   white: "#FFFFFF",
-};
-
-const student = {
-  name: "Aarav Patil",
-  prn: "2024CS1042",
-  branch: "Computer Engineering",
-  year: "Third Year",
-};
-
-const project = {
-  id: "UNI-001",
-  title: "Smart Electricity Issue Monitoring",
-  category: "Electricity",
-  location: "Dhule City",
-  status: "In Progress",
-  progress: 72,
-  mentor: "Dr. Anjali Patil",
 };
 
 const team = {
@@ -97,6 +82,138 @@ function Card({ title, children, action }) {
 
 function StudentDashboard() {
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
+
+  const [project, setProject] = useState(null);
+  const [projectLoading, setProjectLoading] = useState(true);
+  const [projectError, setProjectError] = useState("");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadProjects() {
+      try {
+        setProjectLoading(true);
+        setProjectError("");
+
+        const projects = await getProjects();
+
+        if (!isMounted) return;
+
+        if (Array.isArray(projects) && projects.length > 0) {
+          setProject(projects[0]);
+        } else {
+          setProject(null);
+        }
+      } catch (error) {
+        console.error("Failed to load projects:", error);
+
+        if (!isMounted) return;
+
+        setProjectError(
+          "Unable to load project data from the backend."
+        );
+      } finally {
+        if (isMounted) {
+          setProjectLoading(false);
+        }
+      }
+    }
+
+    loadProjects();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Wait until AuthContext restores the logged-in user
+  if (loading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: COLORS.background,
+          color: COLORS.text,
+          fontFamily: "Arial, sans-serif",
+        }}
+      >
+        Loading student dashboard...
+      </div>
+    );
+  }
+
+  // If there is no logged-in user
+  if (!user) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+          gap: "12px",
+          background: COLORS.background,
+          color: COLORS.text,
+          fontFamily: "Arial, sans-serif",
+        }}
+      >
+        <h2>Session expired</h2>
+
+        <p>Please login again to continue.</p>
+
+        <button
+          onClick={() => navigate("/login/university")}
+          style={{
+            border: "none",
+            background: COLORS.accent,
+            color: COLORS.text,
+            padding: "10px 18px",
+            borderRadius: "8px",
+            cursor: "pointer",
+            fontWeight: "600",
+          }}
+        >
+          Login
+        </button>
+      </div>
+    );
+  }
+
+  /*
+   * User data comes from AuthContext.
+   *
+   * AuthContext gets this data from:
+   * GET /api/auth/me
+   */
+  const student = {
+    name: user.name || "Student",
+    email: user.email || "Not available",
+    phone: user.phone || "Not available",
+    district: user.district || "Not available",
+    role: user.role || "UNIVERSITY_STUDENT",
+
+    prn: user.prn || "Not available",
+    branch: user.branch || "Not available",
+    year: user.year || "Not available",
+  };
+
+  const formatProjectStatus = (status) => {
+    if (!status) return "Not available";
+
+    return status
+      .toLowerCase()
+      .split("_")
+      .map(
+        (word) =>
+          word.charAt(0).toUpperCase() + word.slice(1)
+      )
+      .join(" ");
+  };
 
   return (
     <div
@@ -119,7 +236,14 @@ function StudentDashboard() {
       >
         <div>
           <h2 style={{ margin: 0 }}>Samanvay Portal</h2>
-          <p style={{ margin: "4px 0 0", fontSize: "12px", opacity: 0.65 }}>
+
+          <p
+            style={{
+              margin: "4px 0 0",
+              fontSize: "12px",
+              opacity: 0.65,
+            }}
+          >
             Student Workspace
           </p>
         </div>
@@ -145,15 +269,33 @@ function StudentDashboard() {
         }}
       >
         <div style={{ marginBottom: "26px" }}>
-          <p style={{ margin: 0, fontSize: "13px", opacity: 0.6 }}>
-            Dhule District University
+          <p
+            style={{
+              margin: 0,
+              fontSize: "13px",
+              opacity: 0.6,
+            }}
+          >
+            {student.district !== "Not available"
+              ? `${student.district} District University`
+              : "University Student"}
           </p>
 
-          <h1 style={{ margin: "6px 0", fontSize: "30px" }}>
+          <h1
+            style={{
+              margin: "6px 0",
+              fontSize: "30px",
+            }}
+          >
             Welcome, {student.name}
           </h1>
 
-          <p style={{ margin: 0, opacity: 0.7 }}>
+          <p
+            style={{
+              margin: 0,
+              opacity: 0.7,
+            }}
+          >
             Track your project, team activities and contribution progress.
           </p>
         </div>
@@ -163,15 +305,19 @@ function StudentDashboard() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))",
+              gridTemplateColumns:
+                "repeat(auto-fit,minmax(180px,1fr))",
               gap: "16px",
             }}
           >
             {[
+              ["Name", student.name],
+              ["Email", student.email],
+              ["Phone", student.phone],
               ["PRN", student.prn],
               ["Branch", student.branch],
               ["Year", student.year],
-              ["Role", team.role],
+              ["Role", student.role],
             ].map(([label, value]) => (
               <div
                 key={label}
@@ -196,6 +342,7 @@ function StudentDashboard() {
                     display: "block",
                     marginTop: "6px",
                     fontSize: "14px",
+                    wordBreak: "break-word",
                   }}
                 >
                   {value}
@@ -208,7 +355,8 @@ function StudentDashboard() {
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "minmax(0,1.5fr) minmax(280px,1fr)",
+            gridTemplateColumns:
+              "minmax(0,1.5fr) minmax(280px,1fr)",
             gap: "22px",
             marginTop: "22px",
           }}
@@ -217,62 +365,123 @@ function StudentDashboard() {
           <Card
             title="My Assigned Project"
             action={
-              <span
-                style={{
-                  background: COLORS.light,
-                  padding: "6px 10px",
-                  borderRadius: "20px",
-                  fontSize: "11px",
-                }}
-              >
-                {project.status}
-              </span>
+              project ? (
+                <span
+                  style={{
+                    background: COLORS.light,
+                    padding: "6px 10px",
+                    borderRadius: "20px",
+                    fontSize: "11px",
+                  }}
+                >
+                  {formatProjectStatus(project.status)}
+                </span>
+              ) : null
             }
           >
-            <p style={{ fontSize: "11px", opacity: 0.55 }}>{project.id}</p>
-
-            <h2 style={{ margin: "5px 0", fontSize: "21px" }}>
-              {project.title}
-            </h2>
-
-            <p style={{ opacity: 0.7, fontSize: "13px" }}>
-              {project.category} • {project.location}
-            </p>
-
-            <div style={{ marginTop: "22px" }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: "7px",
-                  fontSize: "12px",
-                }}
-              >
-                <span>Project Progress</span>
-                <strong>{project.progress}%</strong>
-              </div>
-
-              <div
-                style={{
-                  height: "9px",
-                  background: COLORS.light,
-                  borderRadius: "10px",
-                }}
-              >
-                <div
+            {projectLoading ? (
+              <p style={{ fontSize: "13px", opacity: 0.7 }}>
+                Loading project...
+              </p>
+            ) : projectError ? (
+              <div>
+                <p
                   style={{
-                    width: `${project.progress}%`,
-                    height: "100%",
-                    background: COLORS.accent,
-                    borderRadius: "10px",
+                    fontSize: "13px",
+                    color: "#8B3F4F",
                   }}
-                />
+                >
+                  {projectError}
+                </p>
               </div>
-            </div>
+            ) : !project ? (
+              <p style={{ fontSize: "13px", opacity: 0.7 }}>
+                No project assigned yet.
+              </p>
+            ) : (
+              <>
+                <p
+                  style={{
+                    fontSize: "11px",
+                    opacity: 0.55,
+                  }}
+                >
+                  Project ID: {project.id}
+                </p>
 
-            <p style={{ marginTop: "18px", fontSize: "13px" }}>
-              <strong>Mentor:</strong> {project.mentor}
-            </p>
+                <h2
+                  style={{
+                    margin: "5px 0",
+                    fontSize: "21px",
+                  }}
+                >
+                  {project.title}
+                </h2>
+
+                <p
+                  style={{
+                    opacity: 0.7,
+                    fontSize: "13px",
+                  }}
+                >
+                  Project linked to problem #{project.problem_id}
+                </p>
+
+                {project.description && (
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      lineHeight: "1.6",
+                      opacity: 0.75,
+                    }}
+                  >
+                    {project.description}
+                  </p>
+                )}
+
+                <div style={{ marginTop: "22px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      marginBottom: "7px",
+                      fontSize: "12px",
+                    }}
+                  >
+                    <span>Project Progress</span>
+
+                    <strong>{project.progress}%</strong>
+                  </div>
+
+                  <div
+                    style={{
+                      height: "9px",
+                      background: COLORS.light,
+                      borderRadius: "10px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${project.progress}%`,
+                        height: "100%",
+                        background: COLORS.accent,
+                        borderRadius: "10px",
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <p
+                  style={{
+                    marginTop: "18px",
+                    fontSize: "13px",
+                  }}
+                >
+                  <strong>Status:</strong>{" "}
+                  {formatProjectStatus(project.status)}
+                </p>
+              </>
+            )}
           </Card>
 
           {/* Team */}
@@ -286,7 +495,12 @@ function StudentDashboard() {
             >
               <h2 style={{ margin: 0 }}>{team.name}</h2>
 
-              <p style={{ fontSize: "13px", opacity: 0.7 }}>
+              <p
+                style={{
+                  fontSize: "13px",
+                  opacity: 0.7,
+                }}
+              >
                 {team.members} members
               </p>
 
@@ -295,7 +509,9 @@ function StudentDashboard() {
               </p>
 
               <button
-                onClick={() => navigate("/university/student/workspace")}
+                onClick={() =>
+                  navigate("/university/student/workspace")
+                }
                 style={{
                   width: "100%",
                   marginTop: "10px",
@@ -336,7 +552,9 @@ function StudentDashboard() {
                     borderRadius: "10px",
                   }}
                 >
-                  <span style={{ fontSize: "13px" }}>{task.title}</span>
+                  <span style={{ fontSize: "13px" }}>
+                    {task.title}
+                  </span>
 
                   <span
                     style={{
@@ -360,7 +578,9 @@ function StudentDashboard() {
             title="Available Projects"
             action={
               <button
-                onClick={() => navigate("/university/projects")}
+                onClick={() =>
+                  navigate("/university/projects")
+                }
                 style={{
                   border: "none",
                   background: "transparent",
@@ -389,18 +609,37 @@ function StudentDashboard() {
                     borderRadius: "12px",
                   }}
                 >
-                  <p style={{ margin: 0, fontSize: "11px", opacity: 0.55 }}>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "11px",
+                      opacity: 0.55,
+                    }}
+                  >
                     {item.id}
                   </p>
 
-                  <h4 style={{ margin: "7px 0" }}>{item.title}</h4>
+                  <h4
+                    style={{
+                      margin: "7px 0",
+                    }}
+                  >
+                    {item.title}
+                  </h4>
 
-                  <p style={{ margin: 0, fontSize: "12px", opacity: 0.65 }}>
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: "12px",
+                      opacity: 0.65,
+                    }}
+                  >
                     {item.category} • {item.location}
                   </p>
 
                   <p style={{ fontSize: "12px" }}>
-                    Priority: <strong>{item.priority}</strong>
+                    Priority:{" "}
+                    <strong>{item.priority}</strong>
                   </p>
                 </div>
               ))}
