@@ -545,7 +545,8 @@ The current prototype focuses on Dhule District, but the architecture is designe
 | **Prabha Jadhav** | Team Lead, Documentation | [GitHub Profile](https://github.com/prabhajadhav2006) |
 | **Yash Birari** | Backend, AI | [GitHub Profile](https://github.com/Yashbirari2006) |
 | **Pranav Patil** | Documentation | [GitHub Profile](https://github.com/pranav8599) |
-| **Kartikesh Patil** | — | — |
+| **Kartikesh Patil** | — | [GitHub Profile](https://github.com/kartik-patil-05)  |
+| **Vipul Mali** | — | [GitHub Profile](https://github.com/vipulmali26))  |
 
 ---
 
