@@ -1,710 +1,567 @@
-# Samanvay Portal
+# 🌸 Samanvay Portal
 
-### AI-Powered Civic Problem Solving & University–Industry Collaboration Platform
+### *Connecting Citizens • Government • Universities • Industry*
 
-**Samanvay Portal** is a digital civic problem-solving platform designed to connect **citizens, government authorities, universities, students, faculty/mentors, and industry** through a structured, AI-assisted workflow.
+**Samanvay Portal** is a collaborative societal problem-solving platform designed to connect citizens, government authorities, educational institutions, and industries through a unified digital ecosystem.
 
-The platform enables citizens to report real-world societal problems and helps government authorities validate, prioritize, and route those problems to suitable universities and technical teams. AI assists throughout the process by analyzing problems, identifying required expertise, matching problems with university capabilities, and supporting efficient project allocation.
+The platform enables citizens to report local problems, helps authorities validate and prioritize them, and connects suitable university teams and industry partners to transform real-world problems into structured, trackable solutions.
 
-> **Samanvay** means coordination and collaboration — the core principle behind the platform.
-
----
-
-## 🎯 Vision
-
-To create a collaborative ecosystem where:
-
-**Citizen Problems → Government Validation → AI Analysis → University Matching → Talent & Capability Bidding → Team Formation → Project Execution → Industry Collaboration → Deployment → Measurable Social Impact**
-
-Samanvay Portal aims to transform isolated civic complaints into structured, technology-driven projects that can be solved through collaboration between government, academia, students, and industry.
+> **Samanvay** — *Collaboration that turns problems into solutions.*
 
 ---
 
-## 🚀 Key Features
+## ✨ Vision
 
-### 👥 Role-Based Platform
+To create a transparent and collaborative ecosystem where **every societal problem can find the right people, resources, and expertise to solve it.**
 
-The system supports multiple user roles:
+Samanvay brings four major stakeholders together:
 
-* Citizens
-* Government Authorities
-* University Higher Authorities
-* Faculty / Mentors
-* Students
-* Industry Partners
-
-Each role receives its own dashboard and workflow.
+| Stakeholder         | Role                                                         |
+| ------------------- | ------------------------------------------------------------ |
+| 👥 **Citizens**     | Report and track local problems                              |
+| 🏛️ **Government**  | Validate, prioritize, route, and monitor problems            |
+| 🎓 **Universities** | Assign students and faculty to real-world projects           |
+| 🏢 **Industry**     | Provide expertise, technology, mentorship, and collaboration |
 
 ---
 
-### 📍 Location-Based Access
+## 🚀 What Samanvay Does
 
-Location permission is the starting gate of the platform.
+### 1. 📍 Location-Based Problem Reporting
 
-The prototype currently focuses on:
+Citizens can report problems occurring in their locality with relevant information such as:
 
-**Dhule District, Maharashtra**
+* Problem title
+* Category
+* Description
+* Location
+* Landmark
+* Supporting images
+* Submission details
 
-Location information can be used to associate reported problems with the appropriate district and government ecosystem.
-
----
-
-### 🧑‍💼 Citizen Problem Reporting
-
-Citizens can:
-
-* Submit civic problems
-* Add a problem title and detailed description
-* Select a category
-* Provide location information
-* Upload supporting images
-* Track submitted problems
-* View problem status history
-* Receive notifications regarding their problems
-
-The current prototype supports image uploads with validation for file type, size, and maximum number of images.
+The prototype is currently focused on **Dhule District**.
 
 ---
 
-## 🤖 AI-Powered Problem Analysis
+### 2. 🤖 AI-Assisted Problem Intelligence
 
-Samanvay Portal integrates **Groq-powered LLM analysis** to analyze submitted civic problems.
+Samanvay uses AI to reduce manual effort and improve decision-making.
 
-The AI analysis includes:
+**AI capabilities include:**
 
-### Problem Classification
+* 🏷️ Problem classification
+* 📝 Automatic problem summarization
+* ⚡ Priority assessment
+* 🎓 University/project matching
+* 🏢 Industry matching
+* 🔎 Similar-problem detection
 
-Identifies:
-
-* Domain
-* Sub-category
-* Important keywords
-* Required technical/academic expertise
-
-### Problem Summarization
-
-Generates a structured understanding containing:
-
-* Problem statement
-* Public impact
-* Context
-* Practical requirements
-
-### Priority Recommendation
-
-AI recommends a priority score and level based on:
-
-* Severity
-* Public impact
-* Urgency
-* Safety implications
-* Scale of the problem
-
-Government authorities retain the final decision-making authority.
-
-### Similar Problem Detection
-
-The AI compares a newly submitted problem with existing candidate problems and identifies meaningful potential similarities.
-
-Similar problems are treated as **potential matches rather than confirmed duplicates**.
+The AI layer is designed around **LLMs, embeddings, similarity search, and weighted ranking** rather than training custom models.
 
 ---
 
-## ⚡ Problem Priority Structure
+### 3. ⚡ Priority-Based Problem Management
 
-The prototype follows a predefined priority structure:
+Problems are organized according to their societal impact and urgency.
 
-| Problem Area                              | Default Priority |
-| ----------------------------------------- | ---------------- |
-| Electricity-related public infrastructure | High             |
-| Water & sanitation                        | Medium-High      |
-| PWD & road development                    | Minimum          |
+| Priority           | Example                      |
+| ------------------ | ---------------------------- |
+| 🔴 **High**        | Electricity-related problems |
+| 🟠 **Medium-High** | Water & sanitation           |
+| 🟢 **Minimum**     | PWD & road development       |
 
-AI may adjust its recommendation according to the actual severity, scale, urgency, impact, and safety implications of an individual problem.
-
-Final priority decisions remain with government authorities.
+This allows authorities and stakeholders to focus resources where they can create the greatest impact.
 
 ---
 
-# 🏛️ Government Workflow
+### 4. 🎓 University Collaboration
 
-Government authorities form the central validation and coordination layer.
+Universities receive dedicated workspaces for:
 
-The workflow includes:
+* Student management
+* Faculty/mentor management
+* Team formation
+* Project allocation
+* Project monitoring
+* Student workspaces
+* Faculty workspaces
+* University administration
 
-1. Receive citizen problems
-2. Review submitted information
-3. Validate problems
-4. Review AI-generated analysis
-5. Confirm or modify priority
-6. Identify required expertise
-7. Initiate university/talent matching
-8. Invite eligible universities
-9. Evaluate university capability bids
-10. Select a university
-11. Assign the project
-12. Monitor execution
-13. Measure impact
-14. Review citizen feedback
-
-Government users also receive notifications and access to analytics.
+Real societal problems can therefore become **structured student projects with measurable outcomes**.
 
 ---
 
-# 🏫 University Ecosystem
+### 5. 🏢 Industry Collaboration
 
-The university side contains multiple role-specific workspaces.
+Industries can:
 
-### University Higher Authority
+* Explore relevant societal projects
+* View project requirements
+* Identify suitable university teams
+* Send collaboration requests
+* Provide technical expertise
+* Participate in solution development
 
-Responsible for:
-
-* Managing university participation
-* Reviewing assigned problems/projects
-* Allocating projects
-* Managing teams
-* Coordinating faculty and students
-
-### Faculty / Mentors
-
-Responsible for:
-
-* Reviewing project requirements
-* Guiding student teams
-* Monitoring progress
-* Reviewing milestones
-* Supporting technical execution
-
-### Students
-
-Students receive a dedicated workspace to:
-
-* View assigned projects
-* Work within teams
-* Complete tasks
-* Submit milestones
-* Upload project documents
-* Participate in testing
-* Track project progress
+This creates a bridge between **academic innovation and industry capability**.
 
 ---
 
-# 🤝 University Capability & Talent Bidding
+### 6. 📊 End-to-End Project Tracking
 
-Eligible universities can respond to government project requirements.
+Once a problem becomes a project, stakeholders can track:
 
-The system supports:
-
-### University Capability Bids
-
-Universities can demonstrate:
-
-* Available skills
-* Technical expertise
-* Departments
-* Faculty expertise
-* Student capabilities
-* Relevant experience
-* Available resources
-
-### Talent Bidding
-
-Government authorities can identify the expertise required for a problem and allow eligible universities/teams to participate.
-
-AI evaluates and ranks suitable bids to assist government decision-making.
-
-The government retains final selection authority.
-
----
-
-# 🧠 AI Matching & Ranking
-
-The platform is designed to use AI for matching civic problems with appropriate academic and technical capabilities.
-
-The matching workflow is:
-
-```text
-Problem
-   ↓
-AI Analysis
-   ↓
-Required Expertise
-   ↓
-Eligible Universities
-   ↓
-University Capability / Talent Bids
-   ↓
-AI Evaluation & Ranking
-   ↓
-Government Selection
-   ↓
-University Assignment
-```
-
-The AI acts as a decision-support system rather than replacing government authority.
-
----
-
-# 👨‍💻 Project Execution Workflow
-
-After a university is selected:
-
-```text
-Government Assignment
-        ↓
-University Allocation
-        ↓
-Faculty / Mentor Assignment
-        ↓
-Student Team Formation
-        ↓
-Project Creation
-        ↓
-Milestones
-        ↓
-Development
-        ↓
-Documents & Testing
-        ↓
-Industry Collaboration
-        ↓
-Deployment
-        ↓
-Impact Measurement
-        ↓
-Citizen Feedback
-```
-
----
-
-# 🏭 Industry Collaboration
-
-Industry partners can participate in projects by providing:
-
-* Technical expertise
-* Mentorship
-* Development support
-* Industry guidance
-* Technology resources
-* Deployment support
-
-This helps bridge the gap between academic projects and real-world implementation.
-
----
-
-# 📊 Impact Measurement
-
-After deployment, the platform can track the real-world impact of completed projects.
-
-Possible measurements include:
-
-* Number of citizens affected
-* Problem resolution rate
-* Time taken to resolve problems
-* Project completion rate
-* Citizen satisfaction
-* Deployment status
-* Social impact indicators
-
-Citizen feedback can be collected after implementation.
-
----
-
-# 🔔 Notification System
-
-Notifications are available across the platform for relevant workflow events.
-
-Users can receive notifications regarding:
-
-* Problem submission
-* Government validation
-* Status changes
-* Project assignment
-* University bidding
-* Team/project updates
+* Project overview
+* Team members
 * Milestones
-* Approvals
-* Feedback
-* Other workflow events
+* Documents
+* Progress
+* Impact metrics
+* Collaboration status
+
+The goal is to move beyond simply **reporting problems** toward actually **solving them**.
 
 ---
 
-# 🗃️ Prototype Data
-
-The current prototype is scoped to:
-
-**District:** Dhule, Maharashtra
-
-The university ecosystem uses a **synthetic university database** for demonstration purposes.
-
-This allows the complete workflow to be demonstrated without depending on production institutional databases.
-
----
-
-# 🎨 Design System
-
-The Samanvay Portal uses the following fixed color palette:
-
-| Color            | Hex       |
-| ---------------- | --------- |
-| Light Background | `#FFF5F5` |
-| Soft Pink        | `#F7D6D0` |
-| Accent Pink      | `#E2B4BD` |
-| Dark Text        | `#4A4A4A` |
-
-The interface follows a clean, accessible, role-oriented dashboard design.
-
----
-
-# 🏗️ System Architecture
-
-The project follows a frontend-backend-AI architecture.
+## 🧠 AI Architecture
 
 ```text
-┌─────────────────────────────┐
-│          Frontend           │
-│       React Application     │
-└──────────────┬──────────────┘
-               │
-               │ REST API
-               ▼
-┌─────────────────────────────┐
-│          Backend            │
-│          FastAPI             │
-│                             │
-│ Authentication              │
-│ Problems                    │
-│ Government                  │
-│ Universities                │
-│ Projects                    │
-│ Notifications               │
-│ Users                       │
-└──────────────┬──────────────┘
-               │
-       ┌───────┴────────┐
-       ▼                ▼
-┌──────────────┐  ┌──────────────┐
-│  PostgreSQL  │  │   AI Layer   │
-│   Database   │  │    Groq LLM  │
-└──────────────┘  └──────────────┘
+Citizen Problem
+       │
+       ▼
+┌──────────────────────┐
+│   Problem Intake     │
+└──────────┬───────────┘
+           │
+           ▼
+┌──────────────────────┐
+│ AI Classification    │
+└──────────┬───────────┘
+           │
+           ├──────────────► Summarization
+           │
+           ├──────────────► Priority Assessment
+           │
+           ├──────────────► Similarity Detection
+           │
+           ▼
+┌──────────────────────┐
+│ Matching Engine      │
+├──────────────────────┤
+│ University Matching  │
+│ Industry Matching    │
+└──────────┬───────────┘
+           │
+           ▼
+   Solution Project
+           │
+           ▼
+┌──────────────────────┐
+│ Progress & Impact    │
+│ Tracking             │
+└──────────────────────┘
+```
+
+### AI Technology Approach
+
+| Capability          | Approach                       |
+| ------------------- | ------------------------------ |
+| Classification      | LLM zero/few-shot prompting    |
+| Summarization       | LLM abstractive summarization  |
+| Priority            | Hybrid rules + LLM             |
+| Duplicate detection | Embeddings + cosine similarity |
+| University matching | Embeddings + weighted ranking  |
+| Industry matching   | Embeddings + weighted ranking  |
+
+---
+
+## 🏗️ System Architecture
+
+```text
+                         SAMANVAY PORTAL
+                               │
+              ┌────────────────┼────────────────┐
+              │                │                │
+              ▼                ▼                ▼
+         Frontend           Backend          Database
+          React             FastAPI          PostgreSQL
+              │                │                │
+              │                ├──── Auth      │
+              │                ├──── Problems  │
+              │                ├──── Projects  │
+              │                ├──── Matching  │
+              │                └──── AI        │
+              │
+              ▼
+       Role-Based Workspaces
+              │
+     ┌────────┼────────┬──────────┐
+     ▼        ▼        ▼          ▼
+ Citizen  Government University Industry
 ```
 
 ---
 
-# 🛠️ Technology Stack
+## 🎨 Design System
 
-## Frontend
+Samanvay uses a soft, accessible visual language designed around collaboration and community.
 
-* React
-* JavaScript
-* HTML5
-* CSS
-* React-based dashboards and components
+### Color Palette
 
-## Backend
-
-* Python
-* FastAPI
-* SQLAlchemy
-* Pydantic
-* JWT Authentication
-
-## Database
-
-* PostgreSQL
-
-## AI
-
-* Groq API
-* LLM-based structured problem analysis
-* AI classification
-* AI summarization
-* AI priority recommendation
-* Semantic similarity analysis
-* University/talent matching and ranking
-
-## Development
-
-* Git
-* GitHub
-* Python Virtual Environment
-* REST APIs
+| Color              | Hex       |
+| ------------------ | --------- |
+| 🌸 Soft Background | `#FFF5F5` |
+| 🌷 Light Pink      | `#F7D6D0` |
+| 🌹 Rose            | `#E2B4BD` |
+| 🩶 Primary Text    | `#4A4A4A` |
 
 ---
 
-# 📁 Project Structure
+## 🖥️ Prototype Scope
+
+The current prototype is intentionally scoped to:
+
+> **📍 Dhule District, Maharashtra**
+
+Instead of attempting to simulate an entire state or country, the prototype uses a **synthetic Dhule-based university, student, faculty, industry, and societal-problem dataset**.
+
+This allows the complete ecosystem to be demonstrated realistically while keeping the prototype manageable.
+
+---
+
+## 👥 User Roles
+
+### 👤 Citizen
+
+* Location verification
+* Problem reporting
+* Problem history
+* Problem status tracking
+* Notifications
+* Problem details
+
+### 🏛️ Government Authority
+
+* Problem validation
+* AI-assisted classification
+* Priority management
+* Department routing
+* Analytics
+* Impact monitoring
+* Notifications
+
+### 🎓 Student
+
+* Student workspace
+* Assigned projects
+* Team participation
+* Project milestones
+* Documents
+* Progress tracking
+
+### 👨‍🏫 Faculty / Mentor
+
+* Student/team supervision
+* Project monitoring
+* Mentorship
+* Project allocation
+* Progress evaluation
+
+### 🏢 University Authority
+
+* University-wide project management
+* Team management
+* Faculty management
+* Project allocation
+* Institutional monitoring
+
+### 🏢 Industry
+
+* Industry profile
+* Relevant project discovery
+* Collaboration requests
+* Technical contribution
+* Project collaboration
+
+---
+
+## 📁 Project Structure
 
 ```text
 samanvay-portal/
 │
-├── backend/
-│   ├── app/
-│   │   ├── ai/
-│   │   │   ├── analysis_service.py
-│   │   │   ├── classifier.py
-│   │   │   ├── duplicate_detector.py
-│   │   │   ├── embeddings.py
-│   │   │   ├── industry_matcher.py
-│   │   │   ├── llm_client.py
-│   │   │   ├── priority_engine.py
-│   │   │   ├── prompts.py
-│   │   │   ├── schemas.py
-│   │   │   ├── summarizer.py
-│   │   │   └── university_matcher.py
-│   │   │
-│   │   ├── core/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   └── schemas/
-│   │
-│   ├── uploads/
-│   ├── requirements.txt
-│   └── test_groq.py
-│
 ├── frontend/
+│   ├── public/
 │   └── src/
+│       ├── assets/
 │       ├── components/
+│       │   ├── common/
+│       │   ├── problems/
+│       │   ├── dashboard/
+│       │   ├── university/
+│       │   ├── industry/
+│       │   └── projects/
+│       │
 │       ├── pages/
-│       └── ...
+│       │   ├── citizen/
+│       │   ├── government/
+│       │   ├── university/
+│       │   ├── industry/
+│       │   └── projects/
+│       │
+│       ├── layouts/
+│       ├── context/
+│       ├── services/
+│       ├── data/
+│       ├── utils/
+│       ├── App.jsx
+│       ├── main.jsx
+│       └── index.css
 │
+├── backend/
+│   └── app/
+│       ├── core/
+│       ├── models/
+│       ├── schemas/
+│       ├── routes/
+│       ├── services/
+│       └── ai/
+│
+├── database/
+│   ├── schema.sql
+│   ├── seed.sql
+│   └── README.md
+│
+├── docs/
+│   ├── project-overview.md
+│   ├── api-documentation.md
+│   └── demo-flow.md
+│
+├── .env.example
+├── .gitignore
 └── README.md
 ```
 
-> Some AI modules currently represent planned/structured components and will be implemented progressively as the corresponding workflow features are developed.
+---
+
+## 🛠️ Technology Stack
+
+### Frontend
+
+* React
+* React Router
+* Vite
+* Tailwind CSS
+* Lucide Icons
+
+### Backend
+
+* Python
+* FastAPI
+* REST APIs
+* JWT Authentication
+
+### Database
+
+* PostgreSQL
+* Vector search / `pgvector` planned for AI matching
+
+### AI
+
+* LLM APIs
+* Prompt engineering
+* Embeddings
+* Cosine similarity
+* Vector search
+* Weighted ranking
 
 ---
 
-# 🔐 Security
+## 🔐 Security & Privacy
 
-The backend uses:
+The project architecture includes:
 
+* Role-based access
 * JWT-based authentication
-* Role-based access control
-* Password hashing
-* Protected API routes
-* Environment variables for secrets
-* Input validation
-* Image upload validation
+* Environment-based secrets
+* Protected backend routes
+* Separation of frontend and backend responsibilities
 
-Sensitive configuration such as API keys, database credentials, and email credentials should be stored in `.env` and must **not** be committed to GitHub.
+> 🔒 API keys and environment secrets are intentionally excluded from the repository.
 
 ---
 
-# ⚙️ Local Development
-
-## 1. Clone the repository
-
-```bash
-git clone https://github.com/Bhavesh-Malpure/Samanvay-Portal.git
-cd Samanvay-Portal
-```
-
-## 2. Create Python virtual environment
-
-Windows:
-
-```powershell
-python -m venv venv
-```
-
-Activate it:
-
-```powershell
-venv\Scripts\activate
-```
-
-## 3. Install backend dependencies
-
-```powershell
-cd backend
-pip install -r requirements.txt
-```
-
-## 4. Configure environment variables
-
-Create a `.env` file inside the backend directory and configure the required values.
-
-Example:
-
-```env
-DATABASE_URL=your_database_url
-SECRET_KEY=your_secret_key
-GROQ_API_KEY=your_groq_api_key
-
-MAIL_USERNAME=your_email
-MAIL_PASSWORD=your_email_app_password
-MAIL_FROM=your_email
-```
-
-**Never commit `.env` to GitHub.**
-
-## 5. Start the backend
-
-From the `backend` directory:
-
-```powershell
-uvicorn app.main:app --reload
-```
-
-Backend:
+## 🔄 Core Workflow
 
 ```text
-http://127.0.0.1:8000
-```
-
-API documentation:
-
-```text
-http://127.0.0.1:8000/docs
-```
-
-## 6. Start the frontend
-
-From the frontend directory:
-
-```bash
-npm install
-npm run dev
-```
-
-The frontend normally runs on:
-
-```text
-http://localhost:5173
+1. Citizen
+      │
+      ▼
+Report a Societal Problem
+      │
+      ▼
+2. AI Processing
+      │
+      ├── Classification
+      ├── Summary
+      └── Priority
+      │
+      ▼
+3. Government
+      │
+      ├── Validate
+      └── Route
+      │
+      ▼
+4. Matching Engine
+      │
+      ├── University
+      └── Industry
+      │
+      ▼
+5. Project Creation
+      │
+      ▼
+6. Student + Faculty Team
+      │
+      ▼
+7. Solution Development
+      │
+      ▼
+8. Progress Tracking
+      │
+      ▼
+9. Impact Measurement
 ```
 
 ---
 
-# 🧪 AI Testing
+## 📌 Current Development Status
 
-A standalone Groq connectivity test is available:
+### Phase 1 — UI Foundation
 
-```powershell
-python test_groq.py
-```
+* [x] Location Gate
+* [x] Landing Page
+* [x] Login / Registration
+* [x] Citizen Dashboard
+* [x] Government Dashboard structure
+* [x] University workspace structure
+* [x] Industry workspace structure
+* [x] Project workspace structure
+* [x] Notification system structure
 
-A successful connection should return:
+### Phase 2 — Backend
+
+* [x] Backend project structure
+* [x] Authentication structure
+* [x] User models
+* [x] Problem models
+* [x] University models
+* [x] Industry models
+* [x] Project models
+* [x] Notification models
+* [ ] Complete API integration
+* [ ] Database integration
+
+### Phase 3 — AI
+
+* [x] AI module architecture
+* [x] Classification module
+* [x] Summarization module
+* [x] Embedding module
+* [x] Matching modules
+* [x] Priority engine structure
+* [ ] Live LLM integration
+* [ ] Production vector search
+
+### Phase 4 — Demonstration
+
+* [x] Dhule synthetic dataset
+* [ ] Complete end-to-end integration
+* [ ] Interactive maps
+* [ ] Analytics refinement
+* [ ] Final SIH demonstration flow
+
+---
+
+## 🌱 Why Samanvay?
+
+Many societal problems are not difficult because solutions don't exist.
+
+They are difficult because:
+
+**the right problem → doesn't reach the right people → with the right resources → at the right time.**
+
+Samanvay attempts to solve this coordination gap.
+
+Instead of treating a complaint as the end of a process, the platform transforms it into a potential **collaborative innovation project**.
 
 ```text
-Groq connection successful
+Problem
+   ↓
+Understanding
+   ↓
+Prioritization
+   ↓
+Matching
+   ↓
+Collaboration
+   ↓
+Solution
+   ↓
+Impact
 ```
 
 ---
 
-# 🔄 Development Strategy
+## 🎯 Long-Term Vision
 
-Samanvay Portal is being developed using a **feature-by-feature dependency approach**.
+The current prototype focuses on Dhule District, but the architecture is designed to scale toward:
 
-A feature is considered complete only after its applicable:
-
-* Frontend
-* Backend
-* AI
-* Integration
-* Testing
-
-are completed.
-
-The development lifecycle follows:
-
-```text
-Location Permission
-        ↓
-Landing / Home
-        ↓
-Login / Registration
-        ↓
-Role-Based Dashboard
-        ↓
-Citizen Problem Submission
-        ↓
-AI Problem Analysis
-        ↓
-Government Validation
-        ↓
-AI Matching
-        ↓
-Government Talent Bidding
-        ↓
-University Capability Bidding
-        ↓
-AI Bid Evaluation & Ranking
-        ↓
-Government University Selection
-        ↓
-University Project Allocation
-        ↓
-Team Management
-        ↓
-Faculty / Mentor Workflow
-        ↓
-Student Workspace
-        ↓
-Project Execution
-        ↓
-Industry Collaboration
-        ↓
-Milestones / Documents / Testing
-        ↓
-Deployment
-        ↓
-Impact Measurement
-        ↓
-Citizen Feedback
-        ↓
-Government Analytics
-```
-
----
-
-# 🌱 Future Scope
-
-The platform can be expanded beyond the current prototype with:
-
-* Production government integrations
-* Real university databases
-* Advanced semantic matching
-* AI-assisted project planning
-* Real-time chat
-* Payment/incentive systems
+* Multi-district deployment
+* State-level implementation
+* Real-time government integrations
+* Advanced AI recommendations
+* Geographic intelligence
 * Mobile applications
-* Advanced GIS visualization
-* Government open-data integration
-* Real-time analytics
-* Automated impact reporting
-* Scalable multi-district deployment
-* Multi-state expansion
+* Payment and funding workflows
+* Expanded university and industry networks
+* Real-time impact analytics
 
 ---
 
-# 🎓 SIH 2026
+## 👨‍💻 Team
 
-Samanvay Portal is being developed as a **Smart India Hackathon 2026** project prototype focused on creating a technology-enabled ecosystem for solving real-world societal problems through collaboration between citizens, government, academia, and industry.
+# Avinya
+
+**Samanvay Portal — SIH 2026**
+
+> *Building a bridge between society's problems and the people capable of solving them.*
+
+### Team Members
+
+| Member | Role | Profile |
+| ------------------- | -------------------------------- | -------------------------------- |
+| **Bhavesh Malpure** | Frontend, Backend & AI | [GitHub Profile](YOUR_PROFILE_URL) |
+| **Prabha Jadhav** | Team Lead, Documentation | [GitHub Profile](https://github.com/prabhajadhav2006) |
+| **Yash Birari** | Backend, AI | [GitHub Profile](https://github.com/Yashbirari2006) |
+| **Pranav Patil** | Documentation | [GitHub Profile](https://github.com/pranav8599) |
+| **Kartikesh Patil** | — | — |
 
 ---
 
-# 👨‍💻 Team
+## 📄 Documentation
 
-**Team Samanvay**
+Project documentation is available in the [`docs/`](./docs) directory:
 
-Project:
+* [Project Overview](./docs/project-overview.md)
+* [API Documentation](./docs/api-documentation.md)
+* [Demo Flow](./docs/demo-flow.md)
+
+---
+
+## ⭐ Project
+
+If you find the idea useful, consider giving the repository a ⭐.
 
 **Samanvay Portal**
-
-Prototype District:
-
-**Dhule, Maharashtra**
-
----
-
-## 📜 License
-
-This project is intended for educational, demonstration, and hackathon purposes.
-
-License details can be added according to the team's open-source distribution requirements.
-
----
-
-## 💡 Samanvay
-
-> **Connect Problems. Match Talent. Build Solutions. Create Impact.**
+*Read the problem. Connect the people. Build the solution.*
